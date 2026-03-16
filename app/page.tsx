@@ -76,19 +76,19 @@ export default function Home() {
             </a>
           </div>
         </div>
-      </div>
 
-      <div className="mx-auto mt-6 max-w-2xl">
-        <NearbySpots />
-      </div>
+        <div className="mx-auto mt-8 max-w-2xl">
+          <NearbySpots />
+        </div>
 
-      <div className="mt-8 text-center">
-        <a
-          href="/submit"
-          className="inline-flex items-center justify-center rounded-xl bg-white px-6 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100"
-        >
-          + Submit location
-        </a>
+        <div className="mt-8 text-center">
+          <a
+            href="/submit"
+            className="inline-flex items-center justify-center rounded-xl bg-white px-6 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100"
+          >
+            + Submit location
+          </a>
+        </div>
       </div>
     </main>
   )
