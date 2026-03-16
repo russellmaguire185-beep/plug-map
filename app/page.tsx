@@ -18,7 +18,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen px-4 py-6 text-white sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-[980px] rounded-[2rem] border border-white/20 bg-slate-950/60 p-5 shadow-2xl backdrop-blur-xl sm:p-7">
+      <div className="mx-auto max-w-[1100px] rounded-[2rem] border border-white/20 bg-slate-950/60 p-5 shadow-2xl backdrop-blur-xl sm:p-7">
         <div className="text-center">
           <div className="mb-3 text-sm font-medium uppercase tracking-[0.35em] text-white/70">
             Plug Map
