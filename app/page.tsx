@@ -78,18 +78,18 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="mx-auto mt-4 max-w-[760px]">
+      <div className="mx-auto mt-4 flex max-w-[900px] items-center justify-between gap-4">
+      <div className="flex-1 max-w-[760px]">
         <NearbySpots />
       </div>
 
-      <div className="mt-3 text-center">
-        <a
-          href="/submit"
-          className="inline-flex items-center justify-center rounded-xl bg-white px-6 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100"
-        >
-          + Submit location
-        </a>
-      </div>
+      <a
+        href="/submit"
+        className="inline-flex shrink-0 items-center justify-center rounded-xl bg-emerald-300 px-6 py-3 text-sm font-semibold text-slate-900 transition hover:bg-emerald-200"
+      >
+        + Submit location
+      </a>
+    </div>
     </main>
   )
 }
