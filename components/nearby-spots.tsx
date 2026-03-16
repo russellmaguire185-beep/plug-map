@@ -39,8 +39,8 @@ export default function NearbySpots() {
   }
 
   return (
-    <div className="rounded-2xl border border-white/15 bg-white/8 p-4 backdrop-blur-xl">
-      <div className="flex items-center justify-between gap-3">
+    <div className="rounded-2xl border border-white/15 bg-white/8 px-4 py-3 backdrop-blur-xl">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-base font-semibold text-white">Nearby work spots</h2>
           <p className="mt-1 text-xs text-white/65">
@@ -50,14 +50,14 @@ export default function NearbySpots() {
 
         <button
           onClick={findNearby}
-          className="inline-flex shrink-0 items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/20"
+          className="inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/20 sm:self-auto"
         >
           📍 {loading ? 'Searching...' : 'Find nearby'}
         </button>
       </div>
 
       {spots.length > 0 && (
-        <div className="mt-4 space-y-2 border-t border-white/10 pt-4">
+        <div className="mt-3 space-y-2 border-t border-white/10 pt-3">
           {spots.slice(0, 3).map((spot) => (
             <div key={spot.id} className="text-sm text-white/85">
               {spot.name}

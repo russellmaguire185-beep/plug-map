@@ -17,8 +17,8 @@ export default function Home() {
   }, [search, category])
 
   return (
-    <main className="min-h-screen px-4 py-8 text-white sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-[980px] rounded-[2rem] border border-white/20 bg-slate-950/60 p-6 shadow-2xl backdrop-blur-xl sm:p-8">
+    <main className="min-h-screen px-4 py-6 text-white sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[820px] rounded-[2rem] border border-white/20 bg-slate-950/60 p-6 shadow-2xl backdrop-blur-xl sm:p-8">
         <div className="text-center">
           <div className="mb-3 text-sm font-medium uppercase tracking-[0.35em] text-white/70">
             Plug Map
@@ -28,7 +28,7 @@ export default function Home() {
             Find power and a proper place to work in transit
           </h1>
 
-          <p className="mx-auto mt-4 max-w-2xl text-white/80">
+          <p className="mx-auto mt-4 max-w-xl text-white/80">
             Search airports, stations, cafes and service stops with workspace potential.
           </p>
 
@@ -37,8 +37,8 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="mx-auto mt-8 max-w-[860px]">
-          <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_260px_170px]">
+        <div className="mx-auto mt-8 max-w-[700px]">
+          <div className="grid gap-3 md:grid-cols-1 lg:grid-cols-[minmax(0,1fr)_230px_150px]">
             <input
               type="text"
               placeholder="Search city, airport, station or hub code..."
@@ -78,11 +78,11 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="mx-auto mt-4 max-w-[930px]">
+      <div className="mx-auto mt-4 max-w-[620px]">
         <NearbySpots />
       </div>
 
-      <div className="mt-6 text-center">
+      <div className="mt-5 text-center">
         <a
           href="/submit"
           className="inline-flex items-center justify-center rounded-xl bg-white px-6 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100"
