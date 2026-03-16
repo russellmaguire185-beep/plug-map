@@ -38,7 +38,7 @@ export default function Home() {
         </div>
 
         <div className="mx-auto mt-8 max-w-4xl">
-          <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_220px_180px]">
+          <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_270px_180px]">
             <input
               type="text"
               placeholder="Search city, airport, station or hub code..."
@@ -76,19 +76,19 @@ export default function Home() {
             </a>
           </div>
         </div>
+      </div>
 
-        <div className="mx-auto mt-8 max-w-2xl">
-          <NearbySpots />
-        </div>
+      <div className="mx-auto mt-6 max-w-3xl">
+        <NearbySpots />
+      </div>
 
-        <div className="mt-8 text-center">
-          <a
-            href="/submit"
-            className="inline-flex items-center justify-center rounded-xl bg-white px-6 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100"
-          >
-            + Submit location
-          </a>
-        </div>
+      <div className="mt-8 text-center">
+        <a
+          href="/submit"
+          className="inline-flex items-center justify-center rounded-xl bg-white px-6 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100"
+        >
+          + Submit location
+        </a>
       </div>
     </main>
   )
