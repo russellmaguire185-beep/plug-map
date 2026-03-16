@@ -18,7 +18,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen px-4 py-6 text-white sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-[620px] rounded-[2rem] border border-white/20 bg-slate-950/60 p-5 shadow-2xl backdrop-blur-xl sm:p-7">
+      <div className="mx-auto max-w-[980px] rounded-[2rem] border border-white/20 bg-slate-950/60 p-5 shadow-2xl backdrop-blur-xl sm:p-7">
         <div className="text-center">
           <div className="mb-3 text-sm font-medium uppercase tracking-[0.35em] text-white/70">
             Plug Map
@@ -37,7 +37,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="mx-auto mt-4 max-w-[500px]">
+        <div className="mx-auto mt-6 max-w-[860px]">
           <div className="grid gap-3 md:grid-cols-1 lg:grid-cols-[minmax(0,1fr)_230px_150px]">
             <input
               type="text"
@@ -78,7 +78,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="mx-auto mt-2 max-w-[400px]">
+      <div className="mx-auto mt-4 max-w-[760px]">
         <NearbySpots />
       </div>
 
