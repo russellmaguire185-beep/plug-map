@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import ConfirmationButtons from '../../components/confirmation-buttons'
+import NearbySpots from '../../components/nearby-spots'
 
 const ResultsMap = dynamic(() => import('../../components/results-map'), {
   ssr: false,
@@ -65,14 +66,14 @@ export default function ResultsPage() {
       setError('')
 
       let query = supabase
-      .from('locations')
-      .select(
-        'id, name, category, city, country_code, hub_code, terminal, near_gate, train_platform, power, usb, table_type, directions, lat, lng, photo_url'
-      )
-      .eq('status', 'approved')
-      .order('reliability_score', { ascending: false })
-      .order('confirmation_count', { ascending: false })
-      .order('created_at', { ascending: false })
+        .from('locations')
+        .select(
+          'id, name, category, city, country_code, hub_code, terminal, near_gate, train_platform, power, usb, table_type, directions, lat, lng, photo_url'
+        )
+        .eq('status', 'approved')
+        .order('reliability_score', { ascending: false })
+        .order('confirmation_count', { ascending: false })
+        .order('created_at', { ascending: false })
 
       if (filters.category !== 'all') {
         query = query.eq('category', filters.category)
@@ -153,6 +154,10 @@ export default function ResultsPage() {
               Map view
             </button>
           </div>
+        </div>
+
+        <div className="mb-6">
+          <NearbySpots />
         </div>
 
         <div className="mb-6 rounded-[2rem] border border-white/20 bg-white/10 p-5 backdrop-blur-xl">
