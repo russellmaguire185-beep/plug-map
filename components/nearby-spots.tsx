@@ -12,10 +12,30 @@ type NearbySpot = {
   distance_meters?: number | null
 }
 
+const distanceOptions = [
+  { label: '10m', value: 10 },
+  { label: '100m', value: 100 },
+  { label: '1km', value: 1000 },
+  { label: '10km', value: 10000 },
+  { label: '20km', value: 20000 },
+]
+
+function formatDistance(distanceMeters?: number | null) {
+  if (typeof distanceMeters !== 'number') return null
+
+  if (distanceMeters < 1000) {
+    return `${Math.round(distanceMeters)}m away`
+  }
+
+  const km = distanceMeters / 1000
+  return `${km.toFixed(km >= 10 ? 0 : 1)}km away`
+}
+
 export default function NearbySpots() {
   const [spots, setSpots] = useState<NearbySpot[]>([])
   const [loading, setLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [radiusMeters, setRadiusMeters] = useState(1000)
 
   async function findNearby() {
     if (!navigator.geolocation) {
@@ -34,7 +54,7 @@ export default function NearbySpots() {
         const { data, error } = await supabase.rpc('get_nearby_locations', {
           p_lat: lat,
           p_lng: lng,
-          p_radius_meters: 500000,
+          p_radius_meters: radiusMeters,
         })
 
         if (error) {
@@ -62,58 +82,80 @@ export default function NearbySpots() {
   }
 
   return (
-    <div className="rounded-[2rem] border border-white/20 bg-white/10 p-5 backdrop-blur-xl">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-base font-semibold text-white">Nearby work spots</h2>
-          <p className="mt-1 text-xs text-white/65">
-            Find reliable places near your current location
-          </p>
-        </div>
+    <div>
+      <div className="flex flex-col gap-3 sm:gap-4">
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <h2 className="text-lg font-semibold text-white">Nearby work spots</h2>
+            <p className="mt-1 text-sm text-white/65">
+              Find reliable places near your current location
+            </p>
+          </div>
 
-        <button
-          onClick={findNearby}
-          disabled={loading}
-          className="inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-xl border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/20 disabled:opacity-60 sm:self-auto"
-        >
-          📍 {loading ? 'Searching...' : 'Find nearby'}
-        </button>
-      </div>
-
-      {errorMessage && (
-        <div className="mt-3 border-t border-white/10 pt-3 text-sm text-red-300">
-          {errorMessage}
-        </div>
-      )}
-
-      {!loading && !errorMessage && spots.length > 0 && (
-        <div className="mt-3 space-y-2 border-t border-white/10 pt-3">
-          {spots.slice(0, 5).map((spot) => (
-            <div
-              key={spot.id}
-              className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/85"
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <select
+              value={radiusMeters}
+              onChange={(e) => setRadiusMeters(Number(e.target.value))}
+              className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-2.5 text-sm font-medium text-white outline-none transition hover:bg-white/15 sm:w-[130px]"
             >
-              <div className="font-medium text-white">{spot.name}</div>
-              <div className="text-white/65">
-                {[spot.city, spot.hub_code, spot.terminal ? `Terminal ${spot.terminal}` : null]
-                  .filter(Boolean)
-                  .join(' • ')}
-              </div>
-              {typeof spot.distance_meters === 'number' && (
-                <div className="mt-1 text-xs text-cyan-200">
-                  {Math.round(spot.distance_meters)}m away
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
+              {distanceOptions.map((option) => (
+                <option
+                  key={option.value}
+                  value={option.value}
+                  className="text-slate-900"
+                >
+                  {option.label}
+                </option>
+              ))}
+            </select>
 
-      {!loading && !errorMessage && spots.length === 0 && (
-        <div className="mt-3 border-t border-white/10 pt-3 text-sm text-white/65">
-          Tap &quot;Find nearby&quot; to look for approved spots around you.
+            <button
+              onClick={findNearby}
+              disabled={loading}
+              className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/20 disabled:opacity-60"
+            >
+              📍 {loading ? 'Searching...' : 'Find nearby'}
+            </button>
+          </div>
         </div>
-      )}
+
+        {errorMessage && (
+          <div className="border-t border-white/10 pt-3 text-sm text-red-300">
+            {errorMessage}
+          </div>
+        )}
+
+        {!loading && !errorMessage && spots.length > 0 && (
+          <div className="space-y-3 border-t border-white/10 pt-4">
+            {spots.slice(0, 5).map((spot) => (
+              <div
+                key={spot.id}
+                className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/85"
+              >
+                <div className="font-medium text-white">{spot.name}</div>
+
+                <div className="mt-1 text-white/65">
+                  {[spot.city, spot.hub_code, spot.terminal ? `Terminal ${spot.terminal}` : null]
+                    .filter(Boolean)
+                    .join(' • ')}
+                </div>
+
+                {typeof spot.distance_meters === 'number' && (
+                  <div className="mt-2 text-xs font-medium text-cyan-200">
+                    {formatDistance(spot.distance_meters)}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {!loading && !errorMessage && spots.length === 0 && (
+          <div className="border-t border-white/10 pt-3 text-sm text-white/65">
+            Choose a distance and tap &quot;Find nearby&quot; to search around you.
+          </div>
+        )}
+      </div>
     </div>
   )
 }
