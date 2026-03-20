@@ -24,6 +24,8 @@ type LocationItem = {
   power: string | null
   usb: string | null
   table_type: string | null
+  mobile_signal: string | null
+  wifi_available: boolean | null
   directions: string | null
   lat: number | null
   lng: number | null
@@ -36,6 +38,11 @@ function labelValue(value: string | null) {
   return value
     .replaceAll('_', ' ')
     .replace(/\b\w/g, (char) => char.toUpperCase())
+}
+
+function wifiLabel(value: boolean | null) {
+  if (value === null) return 'Unknown'
+  return value ? 'Yes' : 'No'
 }
 
 export default function ResultsPage() {
@@ -68,7 +75,7 @@ export default function ResultsPage() {
       let query = supabase
         .from('locations')
         .select(
-          'id, name, category, city, country_code, hub_code, terminal, near_gate, train_platform, power, usb, table_type, directions, lat, lng, photo_url'
+          'id, name, category, city, country_code, hub_code, terminal, near_gate, train_platform, power, usb, table_type, mobile_signal, wifi_available, directions, lat, lng, photo_url'
         )
         .eq('status', 'approved')
         .order('reliability_score', { ascending: false })
@@ -126,7 +133,7 @@ export default function ResultsPage() {
             </h1>
 
             <p className="mt-2 text-sm text-white/75">
-              Browse submitted work-friendly spots with power, seating and directions.
+              Browse submitted work-friendly spots with power, seating, Wi-Fi, signal and directions.
             </p>
           </div>
 
@@ -225,14 +232,25 @@ export default function ResultsPage() {
                     <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white">
                       {labelValue(location.category)}
                     </span>
+
                     <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white">
                       Power: {labelValue(location.power)}
                     </span>
+
                     <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white">
                       USB: {labelValue(location.usb)}
                     </span>
+
                     <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white">
                       {labelValue(location.table_type)}
+                    </span>
+
+                    <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white">
+                      Signal: {labelValue(location.mobile_signal)}
+                    </span>
+
+                    <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white">
+                      Wi-Fi: {wifiLabel(location.wifi_available)}
                     </span>
                   </div>
 

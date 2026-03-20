@@ -21,6 +21,8 @@ type FormState = {
   power: string
   usb: string
   table_type: string
+  mobile_signal: string
+  wifi_available: string
   directions: string
   lat: string
   lng: string
@@ -39,6 +41,8 @@ const initialForm: FormState = {
   power: '',
   usb: '',
   table_type: '',
+  mobile_signal: '',
+  wifi_available: '',
   directions: '',
   lat: '',
   lng: '',
@@ -165,6 +169,11 @@ export default function SubmitPage() {
       power: form.power || null,
       usb: form.usb || null,
       table_type: form.table_type || null,
+      mobile_signal: form.mobile_signal || null,
+      wifi_available:
+        form.wifi_available === ''
+          ? null
+          : form.wifi_available === 'yes',
       directions: form.directions.trim() || null,
       lat: form.lat ? Number(form.lat) : null,
       lng: form.lng ? Number(form.lng) : null,
@@ -190,7 +199,6 @@ export default function SubmitPage() {
   const showRailFields = form.category === 'rail_station'
   const showBusFields = form.category === 'bus_station'
   const showHubCode = showAirportFields || showRailFields || showBusFields
-  const showTransportDetails = showAirportFields || showRailFields
 
   return (
     <main className="min-h-screen px-4 py-8 text-slate-900 sm:px-6 lg:px-8">
@@ -374,7 +382,7 @@ export default function SubmitPage() {
               Tell people what&apos;s actually useful there.
             </p>
 
-            <div className="mt-4 grid gap-4 sm:grid-cols-3">
+            <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <select
                 value={form.power}
                 onChange={(e) => updateField('power', e.target.value)}
@@ -409,6 +417,28 @@ export default function SubmitPage() {
                 <option value="laptop_knee">Laptop knee</option>
                 <option value="standing_ledge">Standing ledge</option>
                 <option value="soft_seating">Soft seating</option>
+              </select>
+
+              <select
+                value={form.mobile_signal}
+                onChange={(e) => updateField('mobile_signal', e.target.value)}
+                className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none"
+              >
+                <option value="">Mobile signal</option>
+                <option value="fast">Fast</option>
+                <option value="medium">Medium</option>
+                <option value="slow">Slow</option>
+                <option value="none">None</option>
+              </select>
+
+              <select
+                value={form.wifi_available}
+                onChange={(e) => updateField('wifi_available', e.target.value)}
+                className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none"
+              >
+                <option value="">Wi-Fi available</option>
+                <option value="yes">Yes</option>
+                <option value="no">No</option>
               </select>
             </div>
           </section>
