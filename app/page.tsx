@@ -30,28 +30,22 @@ export default function Home() {
             </div>
 
             <h1 className="mx-auto max-w-[1000px] text-3xl font-bold leading-tight tracking-tight sm:text-5xl">
-              Find your next place to work — anywhere.
+              Find work-friendly places in airports, stations and cafes.
             </h1>
 
-            <p className="mx-auto mt-3 max-w-[680px] text-base font-medium text-white/85">
-              Discover laptop-friendly spots with power, seating, signal, and
-              Wi-Fi.
+            <p className="mx-auto mt-2 max-w-[720px] text-base font-medium text-white/70">
+              Discover places with power, Wi-Fi, mobile signal and proper laptop-friendly seating.
             </p>
 
-            <p className="mx-auto mt-2 max-w-[620px] text-sm leading-6 text-white/55 sm:text-base">
-              Built for digital nomads, remote workers, students, and
-              travellers.
+            <p className="mx-auto mt-1 max-w-[680px] text-xs text-white/50">
+              Built for digital nomads, commuters, students, remote workers and travellers.
             </p>
-
-            <div className="mt-6 flex justify-center">
-              <AuthButton />
-            </div>
 
             <div className="mx-auto mt-8 max-w-[860px]">
               <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_220px_140px]">
                 <input
                   type="text"
-                  placeholder="Search city, airport, station or hub code..."
+                  placeholder="Search airport, city, station or location..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   onKeyDown={(e) => {
@@ -86,13 +80,21 @@ export default function Home() {
                 </a>
               </div>
 
-              <div className="mt-4 flex justify-center">
+              <p className="mt-3 text-xs text-white/50">
+                Example: Heathrow T5, Berlin Airport, Paddington Station
+              </p>
+
+              <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
                 <a
                   href="/submit"
                   className="inline-flex items-center justify-center rounded-xl border border-white/20 bg-white/10 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/15"
                 >
-                  + Submit location
+                  + Submit a location
                 </a>
+
+                <div className="inline-flex">
+                  <AuthButton />
+                </div>
               </div>
             </div>
           </div>

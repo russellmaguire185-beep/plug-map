@@ -4,8 +4,45 @@ import { Analytics } from '@vercel/analytics/react'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Plug Map',
-  description: 'Find power, Wi-Fi, mobile signal, and a proper place to work in transit.',
+  metadataBase: new URL('https://www.plug-map.com'),
+  title: 'Plug Map – Find places to work with power, Wi-Fi and seating',
+  description:
+    'Find laptop-friendly places to work in airports, train stations, cafes and service stops. Discover locations with power sockets, Wi-Fi and mobile signal.',
+  keywords: [
+    'airport workspace',
+    'train station workspace',
+    'places to work with wifi',
+    'places to work with power sockets',
+    'laptop friendly cafes',
+    'work while travelling',
+    'digital nomad workspace',
+    'remote work locations',
+    'airport seating with power',
+    'plug map',
+  ],
+  openGraph: {
+    title: 'Plug Map – Find places to work anywhere',
+    description:
+      'Discover laptop-friendly spots with power, Wi-Fi, mobile signal and proper seating.',
+    url: 'https://www.plug-map.com',
+    siteName: 'Plug Map',
+    images: [
+      {
+        url: '/plugmap-bg.png',
+        width: 1200,
+        height: 630,
+        alt: 'Plug Map',
+      },
+    ],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Plug Map – Find places to work anywhere',
+    description:
+      'Discover laptop-friendly spots with power, Wi-Fi, mobile signal and proper seating.',
+    images: ['/plugmap-bg.png'],
+  },
 }
 
 export default function RootLayout({
