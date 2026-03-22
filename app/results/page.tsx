@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
+import { Suspense, useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import ConfirmationButtons from '../../components/confirmation-buttons'
@@ -47,6 +47,14 @@ function wifiLabel(value: boolean | null) {
 }
 
 export default function ResultsPage() {
+  return (
+    <Suspense fallback={<div className="p-6 text-white">Loading...</div>}>
+      <ResultsPageContent />
+    </Suspense>
+  )
+}
+
+function ResultsPageContent() {
   const searchParams = useSearchParams()
 
   const [locations, setLocations] = useState<LocationItem[]>([])
@@ -185,7 +193,9 @@ export default function ResultsPage() {
             </div>
             <div>
               <span className="font-semibold">Category:</span>{' '}
-              {filters.category === 'all' ? 'All categories' : labelValue(filters.category)}
+              {filters.category === 'all'
+                ? 'All categories'
+                : labelValue(filters.category)}
             </div>
             <div>
               <span className="font-semibold">Results:</span> {locations.length}
@@ -234,7 +244,9 @@ export default function ResultsPage() {
                   <div>
                     <h2 className="text-xl font-semibold">{location.name}</h2>
                     <p className="mt-1 text-sm text-white/75">
-                      {[location.city, location.country_code].filter(Boolean).join(', ')}
+                      {[location.city, location.country_code]
+                        .filter(Boolean)
+                        .join(', ')}
                     </p>
                   </div>
 
