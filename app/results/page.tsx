@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import ConfirmationButtons from '../../components/confirmation-buttons'
 import NearbySpots from '../../components/nearby-spots'
@@ -46,26 +47,33 @@ function wifiLabel(value: boolean | null) {
 }
 
 export default function ResultsPage() {
+  const searchParams = useSearchParams()
+
   const [locations, setLocations] = useState<LocationItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [view, setView] = useState<'list' | 'map'>('list')
 
   const filters = useMemo(() => {
-    if (typeof window === 'undefined') {
-      return {
-        q: '',
-        category: 'all',
-      }
-    }
-
-    const params = new URLSearchParams(window.location.search)
-
     return {
-      q: params.get('q')?.trim() || '',
-      category: params.get('category')?.trim() || 'all',
+      q: searchParams.get('q')?.trim() || '',
+      category: searchParams.get('category')?.trim() || 'all',
     }
-  }, [])
+  }, [searchParams])
+
+  const pageTitle = useMemo(() => {
+    if (filters.category === 'cafe') return 'Work-friendly cafes'
+    if (filters.category === 'airport') return 'Airports with power'
+    if (filters.category === 'rail_station') return 'Train stations with seating'
+    if (filters.category === 'hotel_lobby') return 'Work-friendly hotels'
+    if (filters.category === 'bus_station') return 'Bus stations with power'
+    if (filters.category === 'service_station') return 'Service stations with power'
+    if (filters.category === 'restaurant_bar') return 'Work-friendly restaurants and bars'
+    if (filters.category === 'public_building') return 'Work-friendly public buildings'
+    if (filters.category === 'outdoor') return 'Outdoor work-friendly spots'
+    if (filters.category === 'other') return 'Other work-friendly spots'
+    return 'All work-friendly locations'
+  }, [filters.category])
 
   useEffect(() => {
     async function loadLocations() {
@@ -129,7 +137,7 @@ export default function ResultsPage() {
             </Link>
 
             <h1 className="mt-3 text-3xl font-bold tracking-tight">
-              Approved locations
+              {pageTitle}
             </h1>
 
             <p className="mt-2 text-sm text-white/75">
@@ -163,9 +171,11 @@ export default function ResultsPage() {
           </div>
         </div>
 
-        <div className="mb-6">
-          <NearbySpots />
-        </div>
+        {filters.category === 'all' && !filters.q && (
+          <div className="mb-6">
+            <NearbySpots />
+          </div>
+        )}
 
         <div className="mb-6 rounded-[2rem] border border-white/20 bg-white/10 p-5 backdrop-blur-xl">
           <div className="flex flex-wrap gap-3 text-sm text-white/85">

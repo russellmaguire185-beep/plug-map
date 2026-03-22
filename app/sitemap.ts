@@ -14,5 +14,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: 'https://www.plug-map.com/submit',
       lastModified: new Date(),
     },
+    {
+      url: 'https://plug-map.com/work-friendly-cafes',
+      lastModified: new Date(),
+    },
+    {
+      url: 'https://plug-map.com/airports-with-power',
+      lastModified: new Date(),
+    },
+    {
+      url: 'https://plug-map.com/laptop-friendly-spots',
+      lastModified: new Date(),
+    },
   ]
 }

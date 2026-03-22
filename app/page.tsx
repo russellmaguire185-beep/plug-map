@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import AuthButton from '../components/auth-button'
 import NearbySpots from '../components/nearby-spots'
@@ -19,9 +20,9 @@ export default function Home() {
   return (
     <main className="min-h-screen px-4 py-6 text-white sm:px-6 lg:px-8">
       <div className="mx-auto flex max-w-[1100px] flex-col gap-4">
-        <section className="rounded-[2rem] border border-white/15 bg-slate-950/55 px-5 py-6 shadow-2xl backdrop-blur-xl sm:px-8 sm:py-8">
+        <section className="rounded-[2rem] border border-white/15 bg-slate-950/60 px-5 py-7 shadow-2xl backdrop-blur-xl sm:px-8 sm:py-10 md:px-10 md:py-12">
           <div className="mx-auto max-w-[920px] text-center">
-            <div className="mb-1 flex justify-center">
+            <div className="-mb-10 flex justify-center">
               <img
                 src="/assets/plug-map-logo-horizontal.svg"
                 alt="plug-map"
@@ -29,7 +30,7 @@ export default function Home() {
               />
             </div>
 
-            <h1 className="mx-auto max-w-[1000px] text-3xl font-bold leading-tight tracking-tight sm:text-5xl">
+            <h1 className="mx-auto mt-2 max-w-[1000px] text-3xl font-bold leading-snug tracking-tight sm:text-5xl">
               Find work-friendly places in airports, stations and cafes.
             </h1>
 
@@ -95,6 +96,41 @@ export default function Home() {
                 <div className="inline-flex">
                   <AuthButton />
                 </div>
+              </div>
+                <div className="mt-8 border-t border-white/10 pt-6 text-center">
+              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-white/60">
+                Explore
+              </p>
+
+              <div className="mt-4 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-6">
+                <Link
+                  href="/results?category=cafe"
+                  className="text-sm font-medium text-white/85 underline underline-offset-4 transition hover:text-white"
+                >
+                  Work-friendly cafes
+                </Link>
+
+                <Link
+                  href="/results?category=airport"
+                  className="text-sm font-medium text-white/85 underline underline-offset-4 transition hover:text-white"
+                >
+                  Work friendly Airports
+                </Link>
+
+                  <Link
+                  href="/results?category=hotel_lobby"
+                  className="text-sm font-medium text-white/85 underline underline-offset-4 transition hover:text-white"
+                >
+                  Work-friendly hotels
+                </Link>                
+                <Link
+                  href="/results?category=rail_station"
+                  className="text-sm font-medium text-white/85 underline underline-offset-4 transition hover:text-white"
+                >
+                  Work-friendly Train Stations
+                </Link>   
+              </div>
+                      
               </div>
             </div>
           </div>
