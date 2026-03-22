@@ -103,10 +103,7 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <p className="mt-2 text-xs text-white/50">
-                    Takes less than 30 seconds • No signup required
-                  </p>
-                </div>
+                  </div>
                 <div className="mt-8 border-t border-white/10 pt-6 text-center">
               <p className="text-xs font-semibold uppercase tracking-[0.28em] text-white/60">
                 Explore
