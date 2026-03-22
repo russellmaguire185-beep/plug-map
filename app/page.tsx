@@ -85,18 +85,28 @@ export default function Home() {
                 Example: Heathrow T5, Berlin Airport, Paddington Station
               </p>
 
-              <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
-                <a
-                  href="/submit"
-                  className="inline-flex items-center justify-center rounded-xl border border-white/20 bg-white/10 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/15"
-                >
-                  + Submit a location
-                </a>
+              <div className="mt-6 text-center">
+                  <p className="text-sm text-white/70">
+                    Found a place with power, WiFi or good seating?
+                  </p>
 
-                <div className="inline-flex">
-                  <AuthButton />
+                  <div className="mt-3 flex flex-wrap items-center justify-center gap-3">
+                    <a
+                      href="/submit"
+                      className="inline-flex items-center justify-center rounded-xl border border-white/20 bg-white/10 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/15"
+                    >
+                      Add it in 30 seconds ⚡
+                    </a>
+
+                    <div className="inline-flex">
+                      <AuthButton />
+                    </div>
+                  </div>
+
+                  <p className="mt-2 text-xs text-white/50">
+                    Takes less than 30 seconds • No signup required
+                  </p>
                 </div>
-              </div>
                 <div className="mt-8 border-t border-white/10 pt-6 text-center">
               <p className="text-xs font-semibold uppercase tracking-[0.28em] text-white/60">
                 Explore
