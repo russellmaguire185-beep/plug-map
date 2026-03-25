@@ -5,8 +5,8 @@ import Link from 'next/link'
 import { Suspense, useEffect, useMemo, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
-import ConfirmationButtons from '../../components/confirmation-buttons'
 import NearbySpots from '../../components/nearby-spots'
+import ResultCard from '../../components/results/result-card'
 
 const ResultsMap = dynamic(() => import('../../components/results-map'), {
   ssr: false,
@@ -31,6 +31,9 @@ type LocationItem = {
   lat: number | null
   lng: number | null
   photo_url: string | null
+  confirmation_count: number | null
+  last_confirmed_at: string | null
+  reliability_score: number | string | null
 }
 
 function labelValue(value: string | null) {
@@ -39,11 +42,6 @@ function labelValue(value: string | null) {
   return value
     .replaceAll('_', ' ')
     .replace(/\b\w/g, (char) => char.toUpperCase())
-}
-
-function wifiLabel(value: boolean | null) {
-  if (value === null) return 'Unknown'
-  return value ? 'Yes' : 'No'
 }
 
 export default function ResultsPage() {
@@ -83,6 +81,22 @@ function ResultsPageContent() {
     return 'All work-friendly locations'
   }, [filters.category])
 
+  const subtitle = useMemo(() => {
+    if (filters.q && filters.category !== 'all') {
+      return `Showing approved ${labelValue(filters.category).toLowerCase()} results for “${filters.q}”.`
+    }
+
+    if (filters.q) {
+      return `Showing approved results for “${filters.q}”.`
+    }
+
+    if (filters.category !== 'all') {
+      return `Browse approved ${labelValue(filters.category).toLowerCase()} locations with laptop-friendly potential.`
+    }
+
+    return 'Browse approved work-friendly spots with power, seating, Wi-Fi, signal and community verification.'
+  }, [filters.category, filters.q])
+
   useEffect(() => {
     async function loadLocations() {
       setLoading(true)
@@ -91,11 +105,34 @@ function ResultsPageContent() {
       let query = supabase
         .from('locations')
         .select(
-          'id, name, category, city, country_code, hub_code, terminal, near_gate, train_platform, power, usb, table_type, mobile_signal, wifi_available, directions, lat, lng, photo_url'
+          `
+          id,
+          name,
+          category,
+          city,
+          country_code,
+          hub_code,
+          terminal,
+          near_gate,
+          train_platform,
+          power,
+          usb,
+          table_type,
+          mobile_signal,
+          wifi_available,
+          directions,
+          lat,
+          lng,
+          photo_url,
+          confirmation_count,
+          last_confirmed_at,
+          reliability_score
+        `
         )
         .eq('status', 'approved')
-        .order('reliability_score', { ascending: false })
-        .order('confirmation_count', { ascending: false })
+        .order('reliability_score', { ascending: false, nullsFirst: false })
+        .order('confirmation_count', { ascending: false, nullsFirst: false })
+        .order('last_confirmed_at', { ascending: false, nullsFirst: false })
         .order('created_at', { ascending: false })
 
       if (filters.category !== 'all') {
@@ -134,9 +171,9 @@ function ResultsPageContent() {
 
   return (
     <main className="min-h-screen px-4 py-8 text-white sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-6xl">
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <div>
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+          <div className="max-w-3xl">
             <Link
               href="/"
               className="inline-flex text-sm font-medium text-white/80 hover:text-white"
@@ -144,12 +181,12 @@ function ResultsPageContent() {
               ← Back to Plug Map
             </Link>
 
-            <h1 className="mt-3 text-3xl font-bold tracking-tight">
+            <h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
               {pageTitle}
             </h1>
 
-            <p className="mt-2 text-sm text-white/75">
-              Browse submitted work-friendly spots with power, seating, Wi-Fi, signal and directions.
+            <p className="mt-2 text-sm leading-6 text-white/75 sm:text-base">
+              {subtitle}
             </p>
           </div>
 
@@ -185,23 +222,31 @@ function ResultsPageContent() {
           </div>
         )}
 
-        <div className="mb-6 rounded-[2rem] border border-white/20 bg-white/10 p-5 backdrop-blur-xl">
-          <div className="flex flex-wrap gap-3 text-sm text-white/85">
+        <section className="mb-6 rounded-[2rem] border border-white/20 bg-white/10 p-5 backdrop-blur-xl">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 text-sm text-white/85">
             <div>
-              <span className="font-semibold">Search:</span>{' '}
+              <span className="font-semibold text-white">Search:</span>{' '}
               {filters.q || 'None'}
             </div>
+
             <div>
-              <span className="font-semibold">Category:</span>{' '}
+              <span className="font-semibold text-white">Category:</span>{' '}
               {filters.category === 'all'
                 ? 'All categories'
                 : labelValue(filters.category)}
             </div>
+
             <div>
-              <span className="font-semibold">Results:</span> {locations.length}
+              <span className="font-semibold text-white">Results:</span>{' '}
+              {loading ? 'Loading...' : locations.length}
+            </div>
+
+            <div>
+              <span className="font-semibold text-white">Sorted by:</span>{' '}
+              Reliability, confirmations, freshness
             </div>
           </div>
-        </div>
+        </section>
 
         {loading && (
           <div className="rounded-[2rem] border border-white/20 bg-white/10 p-6 text-white/80 backdrop-blur-xl">
@@ -217,7 +262,10 @@ function ResultsPageContent() {
 
         {!loading && !error && locations.length === 0 && (
           <div className="rounded-[2rem] border border-white/20 bg-white/10 p-6 text-white/80 backdrop-blur-xl">
-            No approved locations found for these filters yet.
+            <p className="font-medium text-white">No approved locations found yet.</p>
+            <p className="mt-2">
+              Try another search or category, or be the first to submit a better spot.
+            </p>
           </div>
         )}
 
@@ -226,83 +274,11 @@ function ResultsPageContent() {
         )}
 
         {!loading && !error && locations.length > 0 && view === 'list' && (
-          <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {locations.map((location) => (
-              <div
-                key={location.id}
-                className="overflow-hidden rounded-[2rem] border border-white/20 bg-white/10 backdrop-blur-xl"
-              >
-                {location.photo_url && (
-                  <img
-                    src={location.photo_url}
-                    alt={location.name}
-                    className="h-48 w-full object-cover"
-                  />
-                )}
-
-                <div className="space-y-4 p-5">
-                  <div>
-                    <h2 className="text-xl font-semibold">{location.name}</h2>
-                    <p className="mt-1 text-sm text-white/75">
-                      {[location.city, location.country_code]
-                        .filter(Boolean)
-                        .join(', ')}
-                    </p>
-                  </div>
-
-                  <div className="flex flex-wrap gap-2">
-                    <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white">
-                      {labelValue(location.category)}
-                    </span>
-
-                    <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white">
-                      Power: {labelValue(location.power)}
-                    </span>
-
-                    <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white">
-                      USB: {labelValue(location.usb)}
-                    </span>
-
-                    <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white">
-                      {labelValue(location.table_type)}
-                    </span>
-
-                    <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white">
-                      Signal: {labelValue(location.mobile_signal)}
-                    </span>
-
-                    <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-medium text-white">
-                      Wi-Fi: {wifiLabel(location.wifi_available)}
-                    </span>
-                  </div>
-
-                  <div className="space-y-1 text-sm text-white/80">
-                    {location.hub_code && <div>Hub code: {location.hub_code}</div>}
-                    {location.terminal && <div>Terminal: {location.terminal}</div>}
-                    {location.near_gate && <div>Near gate: {location.near_gate}</div>}
-                    {location.train_platform && <div>Platform: {location.train_platform}</div>}
-                  </div>
-
-                  {location.directions && (
-                    <p className="text-sm text-white/85">{location.directions}</p>
-                  )}
-
-                  <ConfirmationButtons locationId={location.id} />
-
-                  {location.lat !== null && location.lng !== null && (
-                    <a
-                      href={`https://www.google.com/maps?q=${location.lat},${location.lng}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex rounded-xl bg-white px-4 py-2 text-sm font-semibold text-slate-900 transition hover:bg-slate-100"
-                    >
-                      Open in Google Maps
-                    </a>
-                  )}
-                </div>
-              </div>
+              <ResultCard key={location.id} location={location} />
             ))}
-          </div>
+          </section>
         )}
       </div>
     </main>

@@ -1,6 +1,8 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { supabase } from '../lib/supabase'
 
 type ConfirmationType = 'still_works' | 'no_power' | 'crowded' | 'unusable'
 
@@ -16,26 +18,31 @@ const BUTTONS: {
   {
     type: 'still_works',
     label: '✅ Still works',
-    className: 'bg-emerald-500/20 text-emerald-100 border-emerald-300/30 hover:bg-emerald-500/30',
+    className:
+      'bg-emerald-500/20 text-emerald-100 border-emerald-300/30 hover:bg-emerald-500/30',
   },
   {
     type: 'no_power',
     label: '❌ No power',
-    className: 'bg-rose-500/20 text-rose-100 border-rose-300/30 hover:bg-rose-500/30',
+    className:
+      'bg-rose-500/20 text-rose-100 border-rose-300/30 hover:bg-rose-500/30',
   },
   {
     type: 'crowded',
     label: '⚠️ Crowded',
-    className: 'bg-amber-500/20 text-amber-100 border-amber-300/30 hover:bg-amber-500/30',
+    className:
+      'bg-amber-500/20 text-amber-100 border-amber-300/30 hover:bg-amber-500/30',
   },
   {
     type: 'unusable',
     label: '🚫 Unusable',
-    className: 'bg-slate-500/20 text-slate-100 border-slate-300/30 hover:bg-slate-500/30',
+    className:
+      'bg-slate-500/20 text-slate-100 border-slate-300/30 hover:bg-slate-500/30',
   },
 ]
 
 export default function ConfirmationButtons({ locationId }: Props) {
+  const router = useRouter()
   const [submitting, setSubmitting] = useState<ConfirmationType | null>(null)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
@@ -46,10 +53,20 @@ export default function ConfirmationButtons({ locationId }: Props) {
       setMessage('')
       setError('')
 
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+
+      if (!session?.access_token) {
+        setError('Please sign in to confirm a location.')
+        return
+      }
+
       const res = await fetch('/api/locations/confirm', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
           locationId,
@@ -64,7 +81,11 @@ export default function ConfirmationButtons({ locationId }: Props) {
         return
       }
 
-      setMessage('Thanks — confirmation submitted.')
+      setMessage(data.updated
+        ? 'Thanks — your confirmation was updated.'
+        : 'Thanks — confirmation submitted.')
+
+      router.refresh()
     } catch {
       setError('Something went wrong while submitting.')
     } finally {
