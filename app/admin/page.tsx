@@ -113,6 +113,22 @@ export default async function AdminPage() {
           <p className="mt-2 text-slate-600">
             Review pending Plug Map submissions before they go live.
           </p>
+
+          <div className="mt-5 flex flex-wrap gap-3">
+            <a
+              href="/admin"
+              className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white"
+            >
+              Pending submissions
+            </a>
+
+            <a
+              href="/admin/attribute-reports"
+              className="rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-200"
+            >
+              Attribute reports
+            </a>
+          </div>
         </div>
 
         {error ? (

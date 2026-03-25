@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react'
 import Image from 'next/image'
 import ConfirmationButtons from '../confirmation-buttons'
+import AttributeReportModal from './attribute-report-modal'
 
 type Location = {
   id: string
@@ -34,6 +35,7 @@ type ResultCardProps = {
 
 export default function ResultCard({ location }: ResultCardProps) {
   const [isImageOpen, setIsImageOpen] = useState(false)
+  const [isSuggestOpen, setIsSuggestOpen] = useState(false)
 
   const placeLine = useMemo(() => {
     const bits: string[] = []
@@ -83,10 +85,10 @@ export default function ResultCard({ location }: ResultCardProps) {
   }, [location])
 
   const confirmationCount = location.confirmation_count ?? 0
-      const reliabilityScore =
-      location.reliability_score === null || location.reliability_score === undefined
-        ? null
-        : Number(location.reliability_score)
+  const reliabilityScore =
+    location.reliability_score === null || location.reliability_score === undefined
+      ? null
+      : Number(location.reliability_score)
 
   const trustLabel = getTrustLabel(reliabilityScore, confirmationCount)
 
@@ -94,7 +96,6 @@ export default function ResultCard({ location }: ResultCardProps) {
     <>
       <article className="overflow-hidden rounded-3xl border border-white/15 bg-white/10 backdrop-blur-md shadow-xl">
         <div className="p-5">
-          {/* Header */}
           <div className="mb-4">
             <div className="mb-2 flex items-start justify-between gap-3">
               <div>
@@ -120,7 +121,6 @@ export default function ResultCard({ location }: ResultCardProps) {
             </div>
           </div>
 
-          {/* Workability */}
           <section className="mb-4">
             <h4 className="mb-3 text-sm font-semibold uppercase tracking-wide text-white/70">
               Workability
@@ -155,7 +155,6 @@ export default function ResultCard({ location }: ResultCardProps) {
             </div>
           </section>
 
-          {/* Trust / community */}
           <section className="mb-4 rounded-2xl border border-white/10 bg-black/15 p-4">
             <div className="mb-2 flex items-center justify-between gap-3">
               <h4 className="text-sm font-semibold uppercase tracking-wide text-white/70">
@@ -196,7 +195,6 @@ export default function ResultCard({ location }: ResultCardProps) {
             )}
           </section>
 
-          {/* Notes / directions */}
           {location.directions ? (
             <section className="mb-4">
               <h4 className="mb-2 text-sm font-semibold uppercase tracking-wide text-white/70">
@@ -206,7 +204,6 @@ export default function ResultCard({ location }: ResultCardProps) {
             </section>
           ) : null}
 
-          {/* Image */}
           {location.photo_url ? (
             <section className="mb-4">
               <button
@@ -231,9 +228,16 @@ export default function ResultCard({ location }: ResultCardProps) {
             </section>
           ) : null}
 
-          {/* Actions */}
           <section className="space-y-3">
             <ConfirmationButtons locationId={location.id} />
+
+            <button
+              type="button"
+              onClick={() => setIsSuggestOpen(true)}
+              className="inline-flex items-center justify-center rounded-xl border border-white/15 bg-white/10 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/15"
+            >
+              Suggest details
+            </button>
 
             <a
               href={googleMapsUrl}
@@ -252,6 +256,14 @@ export default function ResultCard({ location }: ResultCardProps) {
           src={location.photo_url}
           alt={location.name}
           onClose={() => setIsImageOpen(false)}
+        />
+      ) : null}
+
+      {isSuggestOpen ? (
+        <AttributeReportModal
+          locationId={location.id}
+          locationName={location.name}
+          onClose={() => setIsSuggestOpen(false)}
         />
       ) : null}
     </>
@@ -275,9 +287,7 @@ function SignalPill({
   }
 
   return (
-    <div
-      className={`rounded-2xl border px-3 py-3 ${toneClasses[tone]}`}
-    >
+    <div className={`rounded-2xl border px-3 py-3 ${toneClasses[tone]}`}>
       <div className="text-[11px] font-semibold uppercase tracking-wide opacity-80">
         {label}
       </div>
@@ -347,40 +357,31 @@ function formatCategory(category?: string | null) {
 
 function formatPower(power?: string | null) {
   if (!power) return 'Unknown'
-
   const normalized = power.toLowerCase()
-
-  if (normalized.includes('socket')) return 'Sockets'
-  if (normalized.includes('visible') && normalized.includes('no')) return 'No visible sockets'
   if (normalized === 'yes') return 'Yes'
+  if (normalized === 'limited') return 'Limited'
   if (normalized === 'no') return 'No'
-
+  if (normalized === 'unknown') return 'Unknown'
   return power
 }
 
 function formatUsb(usb?: string | null) {
   if (!usb) return 'Unknown'
-
   const normalized = usb.toLowerCase()
   if (normalized === 'yes') return 'Yes'
   if (normalized === 'no') return 'No'
   if (normalized === 'unknown') return 'Unknown'
-
   return usb
 }
 
 function formatTableType(tableType?: string | null) {
   if (!tableType) return 'Unknown'
-
   const normalized = tableType.toLowerCase()
-
-  if (normalized.includes('full')) return 'Full table'
-  if (normalized.includes('small')) return 'Small table'
-  if (normalized.includes('lap')) return 'Lap only'
-
-  return tableType
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, (char) => char.toUpperCase())
+  if (normalized === 'full_table') return 'Full table'
+  if (normalized === 'small_table') return 'Small table'
+  if (normalized === 'lap_only') return 'Lap only'
+  if (normalized === 'unknown') return 'Unknown'
+  return tableType.replace(/_/g, ' ')
 }
 
 function formatWifi(wifi?: boolean | null) {
@@ -391,24 +392,20 @@ function formatWifi(wifi?: boolean | null) {
 
 function formatSignal(signal?: string | null) {
   if (!signal) return 'Unknown'
-
-  return signal
-    .replace(/_/g, ' ')
-    .replace(/\b\w/g, (char) => char.toUpperCase())
+  return signal.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase())
 }
 
 function getPowerTone(power?: string | null): 'good' | 'warn' | 'bad' | 'neutral' {
   if (!power) return 'warn'
-
   const normalized = power.toLowerCase()
-  if (normalized.includes('no')) return 'bad'
-  if (normalized.includes('socket') || normalized === 'yes') return 'good'
+  if (normalized === 'yes') return 'good'
+  if (normalized === 'limited') return 'warn'
+  if (normalized === 'no') return 'bad'
   return 'warn'
 }
 
 function getUsbTone(usb?: string | null): 'good' | 'warn' | 'bad' | 'neutral' {
   if (!usb) return 'warn'
-
   const normalized = usb.toLowerCase()
   if (normalized === 'yes') return 'good'
   if (normalized === 'no') return 'bad'
@@ -417,11 +414,10 @@ function getUsbTone(usb?: string | null): 'good' | 'warn' | 'bad' | 'neutral' {
 
 function getTableTone(tableType?: string | null): 'good' | 'warn' | 'bad' | 'neutral' {
   if (!tableType) return 'warn'
-
   const normalized = tableType.toLowerCase()
-  if (normalized.includes('full')) return 'good'
-  if (normalized.includes('small')) return 'warn'
-  if (normalized.includes('lap')) return 'bad'
+  if (normalized === 'full_table') return 'good'
+  if (normalized === 'small_table') return 'warn'
+  if (normalized === 'lap_only') return 'bad'
   return 'neutral'
 }
 
@@ -433,15 +429,12 @@ function getWifiTone(wifi?: boolean | null): 'good' | 'warn' | 'bad' | 'neutral'
 
 function getSignalTone(signal?: string | null): 'good' | 'warn' | 'bad' | 'neutral' {
   if (!signal) return 'warn'
-
   const normalized = signal.toLowerCase()
-  if (normalized === 'fast') return 'good'
-  if (normalized === 'medium') return 'good'
+  if (normalized === 'fast' || normalized === 'medium') return 'good'
   if (normalized === 'slow') return 'warn'
   if (normalized === 'nothing' || normalized === 'none' || normalized === 'no') {
     return 'bad'
   }
-
   return 'warn'
 }
 
@@ -449,7 +442,6 @@ function getTrustLabel(
   reliabilityScore: number | null,
   confirmationCount: number
 ): { label: string; className: string } {
-
   if (confirmationCount === 0) {
     return {
       label: 'Needs verification',
