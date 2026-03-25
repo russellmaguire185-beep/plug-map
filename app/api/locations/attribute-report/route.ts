@@ -40,10 +40,10 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
 
     const locationId = String(body.locationId || '').trim()
-    const power = normalizeOptionalEnum<PowerValue>(body.power, POWER_VALUES)
-    const usb = normalizeOptionalEnum<UsbValue>(body.usb, USB_VALUES)
-    const tableType = normalizeOptionalEnum<TableValue>(body.table_type, TABLE_VALUES)
-    const mobileSignal = normalizeOptionalEnum<SignalValue>(body.mobile_signal, SIGNAL_VALUES)
+    const power = normalizeOptionalEnum(body.power, POWER_VALUES)
+    const usb = normalizeOptionalEnum(body.usb, USB_VALUES)
+    const tableType = normalizeOptionalEnum(body.table_type, TABLE_VALUES)
+    const mobileSignal = normalizeOptionalEnum(body.mobile_signal, SIGNAL_VALUES)
     const wifiAvailable = normalizeOptionalBoolean(body.wifi_available)
     const notes = normalizeOptionalText(body.notes)
 
