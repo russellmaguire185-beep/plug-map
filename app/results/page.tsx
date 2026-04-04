@@ -385,9 +385,9 @@ function ResultsPageContent() {
         return
       }
 
-      let nextLocations = ((data as LocationItem[]) ?? []).map((item) => ({
+          let nextLocations: LocationItem[] = ((data as LocationItem[]) ?? []).map((item) => ({
         ...item,
-        distance_meters: null,
+        distance_meters: null as number | null,
       }))
 
       if (filters.sort === 'nearest' && userCoords) {
