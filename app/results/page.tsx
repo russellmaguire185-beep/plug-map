@@ -34,6 +34,7 @@ type LocationItem = {
   last_confirmed_at: string | null
   reliability_score: number | string | null
   created_at?: string | null
+  distance_meters?: number | null
 }
 
 type SortOption =
@@ -41,6 +42,7 @@ type SortOption =
   | 'reliable'
   | 'confirmed'
   | 'recent'
+  | 'nearest'
 
 function labelValue(value: string | null) {
   if (!value) return 'Unknown'
@@ -74,6 +76,29 @@ function ContributionPrompt({
       </div>
     </section>
   )
+}
+
+function haversineDistanceMeters(
+  lat1: number,
+  lng1: number,
+  lat2: number,
+  lng2: number
+) {
+  const toRad = (value: number) => (value * Math.PI) / 180
+  const earthRadius = 6371000
+
+  const dLat = toRad(lat2 - lat1)
+  const dLng = toRad(lng2 - lng1)
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRad(lat1)) *
+      Math.cos(toRad(lat2)) *
+      Math.sin(dLng / 2) *
+      Math.sin(dLng / 2)
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+  return earthRadius * c
 }
 
 function ResultsFilterBar({
@@ -146,6 +171,7 @@ function ResultsFilterBar({
           className="w-full rounded-2xl border border-white/15 bg-white/92 px-4 py-4 text-sm text-slate-900 outline-none"
         >
           <option value="best">Best match</option>
+          <option value="nearest">Nearest</option>
           <option value="reliable">Most reliable</option>
           <option value="confirmed">Most confirmed</option>
           <option value="recent">Recently confirmed</option>
@@ -186,6 +212,8 @@ function ResultsPageContent() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [view, setView] = useState<'list' | 'map'>('list')
+  const [userCoords, setUserCoords] = useState<{ lat: number; lng: number } | null>(null)
+  const [geoError, setGeoError] = useState('')
 
   const filters = useMemo(() => {
     const sortParam = (searchParams.get('sort')?.trim() || 'best') as SortOption
@@ -193,7 +221,7 @@ function ResultsPageContent() {
     return {
       q: searchParams.get('q')?.trim() || '',
       category: searchParams.get('category')?.trim() || 'all',
-      sort: ['best', 'reliable', 'confirmed', 'recent'].includes(sortParam)
+      sort: ['best', 'reliable', 'confirmed', 'recent', 'nearest'].includes(sortParam)
         ? sortParam
         : 'best',
     }
@@ -214,6 +242,7 @@ function ResultsPageContent() {
   }, [filters.category])
 
   const sortLabel = useMemo(() => {
+    if (filters.sort === 'nearest') return 'Nearest'
     if (filters.sort === 'reliable') return 'Most reliable'
     if (filters.sort === 'confirmed') return 'Most confirmed'
     if (filters.sort === 'recent') return 'Recently confirmed'
@@ -235,6 +264,38 @@ function ResultsPageContent() {
 
     return 'Browse approved work-friendly spots with power, seating, Wi-Fi, signal and community verification.'
   }, [filters.category, filters.q])
+
+  useEffect(() => {
+    if (filters.sort !== 'nearest') {
+      setGeoError('')
+      return
+    }
+
+    if (!navigator.geolocation) {
+      setGeoError('Geolocation is not supported in this browser, so nearest sorting is unavailable.')
+      setUserCoords(null)
+      return
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setUserCoords({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        })
+        setGeoError('')
+      },
+      () => {
+        setGeoError('Location access was denied, so results could not be sorted by nearest.')
+        setUserCoords(null)
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 300000,
+      }
+    )
+  }, [filters.sort])
 
   useEffect(() => {
     async function loadLocations() {
@@ -324,12 +385,62 @@ function ResultsPageContent() {
         return
       }
 
-      setLocations((data as LocationItem[]) ?? [])
+      let nextLocations = ((data as LocationItem[]) ?? []).map((item) => ({
+        ...item,
+        distance_meters: null,
+      }))
+
+      if (filters.sort === 'nearest' && userCoords) {
+        nextLocations = nextLocations
+          .map((item) => {
+            if (
+              typeof item.lat === 'number' &&
+              typeof item.lng === 'number'
+            ) {
+              return {
+                ...item,
+                distance_meters: haversineDistanceMeters(
+                  userCoords.lat,
+                  userCoords.lng,
+                  item.lat,
+                  item.lng
+                ),
+              }
+            }
+
+            return item
+          })
+          .sort((a, b) => {
+            const aDistance =
+              typeof a.distance_meters === 'number'
+                ? a.distance_meters
+                : Number.MAX_SAFE_INTEGER
+            const bDistance =
+              typeof b.distance_meters === 'number'
+                ? b.distance_meters
+                : Number.MAX_SAFE_INTEGER
+
+            if (aDistance !== bDistance) return aDistance - bDistance
+
+            const aReliability =
+              a.reliability_score === null || a.reliability_score === undefined
+                ? 0
+                : Number(a.reliability_score)
+            const bReliability =
+              b.reliability_score === null || b.reliability_score === undefined
+                ? 0
+                : Number(b.reliability_score)
+
+            return bReliability - aReliability
+          })
+      }
+
+      setLocations(nextLocations)
       setLoading(false)
     }
 
     loadLocations()
-  }, [filters.category, filters.q, filters.sort])
+  }, [filters.category, filters.q, filters.sort, userCoords])
 
   return (
     <main className="min-h-screen px-4 py-8 text-white sm:px-6 lg:px-8">
@@ -408,6 +519,12 @@ function ResultsPageContent() {
               {sortLabel}
             </div>
           </div>
+
+          {filters.sort === 'nearest' && geoError && (
+            <div className="mt-4 rounded-2xl border border-amber-300/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+              {geoError}
+            </div>
+          )}
         </section>
 
         {!loading && !error && (
