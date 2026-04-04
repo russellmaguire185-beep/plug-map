@@ -242,12 +242,6 @@ function ResultsPageContent() {
           </div>
         </div>
 
-        {filters.category === 'all' && !filters.q && (
-          <div className="mb-6">
-            <NearbySpots />
-          </div>
-        )}
-
         <section className="mb-6 rounded-[2rem] border border-white/20 bg-white/10 p-5 backdrop-blur-xl">
           <div className="flex flex-col gap-3 text-sm text-white/85 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
             <div>
