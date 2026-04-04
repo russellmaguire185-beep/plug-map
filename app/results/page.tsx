@@ -3,9 +3,8 @@
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { Suspense, useEffect, useMemo, useState } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
-import NearbySpots from '../../components/nearby-spots'
 import ResultCard from '../../components/results/result-card'
 
 const ResultsMap = dynamic(() => import('../../components/results-map'), {
@@ -34,7 +33,14 @@ type LocationItem = {
   confirmation_count: number | null
   last_confirmed_at: string | null
   reliability_score: number | string | null
+  created_at?: string | null
 }
+
+type SortOption =
+  | 'best'
+  | 'reliable'
+  | 'confirmed'
+  | 'recent'
 
 function labelValue(value: string | null) {
   if (!value) return 'Unknown'
@@ -70,6 +76,101 @@ function ContributionPrompt({
   )
 }
 
+function ResultsFilterBar({
+  initialQuery,
+  initialCategory,
+  initialSort,
+}: {
+  initialQuery: string
+  initialCategory: string
+  initialSort: SortOption
+}) {
+  const router = useRouter()
+  const [query, setQuery] = useState(initialQuery)
+  const [category, setCategory] = useState(initialCategory)
+  const [sort, setSort] = useState<SortOption>(initialSort)
+
+  function applyFilters() {
+    const params = new URLSearchParams()
+
+    if (query.trim()) params.set('q', query.trim())
+    if (category !== 'all') params.set('category', category)
+    if (sort !== 'best') params.set('sort', sort)
+
+    const nextUrl = params.toString() ? `/results?${params.toString()}` : '/results'
+    router.push(nextUrl)
+  }
+
+  function clearFilters() {
+    setQuery('')
+    setCategory('all')
+    setSort('best')
+    router.push('/results')
+  }
+
+  return (
+    <section className="mb-6 rounded-[2rem] border border-white/20 bg-white/10 p-5 backdrop-blur-xl">
+      <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_220px_220px_140px_120px]">
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') applyFilters()
+          }}
+          placeholder="Search airport, city, station or location..."
+          className="w-full rounded-2xl border border-white/15 bg-white/92 px-5 py-4 text-base text-slate-900 outline-none placeholder:text-slate-500"
+        />
+
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="w-full rounded-2xl border border-white/15 bg-white/92 px-4 py-4 text-sm text-slate-900 outline-none"
+        >
+          <option value="all">All categories</option>
+          <option value="airport">Airport</option>
+          <option value="rail_station">Train station</option>
+          <option value="bus_station">Bus station</option>
+          <option value="service_station">Service station</option>
+          <option value="cafe">Cafe</option>
+          <option value="restaurant_bar">Restaurant / Bar</option>
+          <option value="hotel_lobby">Hotel lobby</option>
+          <option value="public_building">Public building</option>
+          <option value="outdoor">Outdoor</option>
+          <option value="other">Other</option>
+        </select>
+
+        <select
+          value={sort}
+          onChange={(e) => setSort(e.target.value as SortOption)}
+          className="w-full rounded-2xl border border-white/15 bg-white/92 px-4 py-4 text-sm text-slate-900 outline-none"
+        >
+          <option value="best">Best match</option>
+          <option value="reliable">Most reliable</option>
+          <option value="confirmed">Most confirmed</option>
+          <option value="recent">Recently confirmed</option>
+        </select>
+
+        <button
+          type="button"
+          onClick={applyFilters}
+          className="inline-flex items-center justify-center rounded-2xl bg-white px-6 py-4 text-sm font-semibold text-slate-900 transition hover:bg-slate-100"
+        >
+          Apply
+        </button>
+
+        <button
+          type="button"
+          onClick={clearFilters}
+          className="inline-flex items-center justify-center rounded-2xl border border-white/20 bg-white/10 px-6 py-4 text-sm font-semibold text-white transition hover:bg-white/15"
+        >
+          Clear
+        </button>
+      </div>
+    </section>
+  )
+}
+
 export default function ResultsPage() {
   return (
     <Suspense fallback={<div className="p-6 text-white">Loading...</div>}>
@@ -87,9 +188,14 @@ function ResultsPageContent() {
   const [view, setView] = useState<'list' | 'map'>('list')
 
   const filters = useMemo(() => {
+    const sortParam = (searchParams.get('sort')?.trim() || 'best') as SortOption
+
     return {
       q: searchParams.get('q')?.trim() || '',
       category: searchParams.get('category')?.trim() || 'all',
+      sort: ['best', 'reliable', 'confirmed', 'recent'].includes(sortParam)
+        ? sortParam
+        : 'best',
     }
   }, [searchParams])
 
@@ -106,6 +212,13 @@ function ResultsPageContent() {
     if (filters.category === 'other') return 'Other work-friendly spots'
     return 'All work-friendly locations'
   }, [filters.category])
+
+  const sortLabel = useMemo(() => {
+    if (filters.sort === 'reliable') return 'Most reliable'
+    if (filters.sort === 'confirmed') return 'Most confirmed'
+    if (filters.sort === 'recent') return 'Recently confirmed'
+    return 'Best match'
+  }, [filters.sort])
 
   const subtitle = useMemo(() => {
     if (filters.q && filters.category !== 'all') {
@@ -152,14 +265,11 @@ function ResultsPageContent() {
           photo_url,
           confirmation_count,
           last_confirmed_at,
-          reliability_score
+          reliability_score,
+          created_at
         `
         )
         .eq('status', 'approved')
-        .order('reliability_score', { ascending: false, nullsFirst: false })
-        .order('confirmation_count', { ascending: false, nullsFirst: false })
-        .order('last_confirmed_at', { ascending: false, nullsFirst: false })
-        .order('created_at', { ascending: false })
 
       if (filters.category !== 'all') {
         query = query.eq('category', filters.category)
@@ -179,6 +289,32 @@ function ResultsPageContent() {
         )
       }
 
+      if (filters.sort === 'reliable') {
+        query = query
+          .order('reliability_score', { ascending: false, nullsFirst: false })
+          .order('confirmation_count', { ascending: false, nullsFirst: false })
+          .order('last_confirmed_at', { ascending: false, nullsFirst: false })
+          .order('created_at', { ascending: false })
+      } else if (filters.sort === 'confirmed') {
+        query = query
+          .order('confirmation_count', { ascending: false, nullsFirst: false })
+          .order('reliability_score', { ascending: false, nullsFirst: false })
+          .order('last_confirmed_at', { ascending: false, nullsFirst: false })
+          .order('created_at', { ascending: false })
+      } else if (filters.sort === 'recent') {
+        query = query
+          .order('last_confirmed_at', { ascending: false, nullsFirst: false })
+          .order('confirmation_count', { ascending: false, nullsFirst: false })
+          .order('reliability_score', { ascending: false, nullsFirst: false })
+          .order('created_at', { ascending: false })
+      } else {
+        query = query
+          .order('reliability_score', { ascending: false, nullsFirst: false })
+          .order('confirmation_count', { ascending: false, nullsFirst: false })
+          .order('last_confirmed_at', { ascending: false, nullsFirst: false })
+          .order('created_at', { ascending: false })
+      }
+
       const { data, error } = await query
 
       if (error) {
@@ -193,7 +329,7 @@ function ResultsPageContent() {
     }
 
     loadLocations()
-  }, [filters.category, filters.q])
+  }, [filters.category, filters.q, filters.sort])
 
   return (
     <main className="min-h-screen px-4 py-8 text-white sm:px-6 lg:px-8">
@@ -242,6 +378,12 @@ function ResultsPageContent() {
           </div>
         </div>
 
+        <ResultsFilterBar
+          initialQuery={filters.q}
+          initialCategory={filters.category}
+          initialSort={filters.sort}
+        />
+
         <section className="mb-6 rounded-[2rem] border border-white/20 bg-white/10 p-5 backdrop-blur-xl">
           <div className="flex flex-col gap-3 text-sm text-white/85 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
             <div>
@@ -263,7 +405,7 @@ function ResultsPageContent() {
 
             <div>
               <span className="font-semibold text-white">Sorted by:</span>{' '}
-              Reliability, confirmations, freshness
+              {sortLabel}
             </div>
           </div>
         </section>
