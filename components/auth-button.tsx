@@ -10,17 +10,25 @@ export default function AuthButton() {
   useEffect(() => {
     let mounted = true
 
-    async function getUser() {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser()
+    async function refreshUser() {
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession()
 
-      if (!mounted) return
-      setEmail(user?.email ?? null)
-      setLoading(false)
+        if (!mounted) return
+
+        setEmail(session?.user?.email ?? null)
+      } catch (error) {
+        console.error('Auth refreshUser error:', error)
+        if (!mounted) return
+        setEmail(null)
+      } finally {
+        if (mounted) setLoading(false)
+      }
     }
 
-    getUser()
+    refreshUser()
 
     const {
       data: { subscription },

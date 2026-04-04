@@ -44,6 +44,32 @@ function labelValue(value: string | null) {
     .replace(/\b\w/g, (char) => char.toUpperCase())
 }
 
+function ContributionPrompt({
+  title,
+  description,
+}: {
+  title: string
+  description: string
+}) {
+  return (
+    <section className="rounded-[2rem] border border-sky-300/45 bg-sky-500/18 p-5 backdrop-blur-xl shadow-[0_0_0_1px_rgba(56,189,248,0.18),0_10px_30px_rgba(56,189,248,0.16)]">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <p className="text-lg font-semibold text-white/95">{title}</p>
+          <p className="mt-1 text-sm text-white/85">{description}</p>
+        </div>
+
+        <Link
+          href="/submit"
+          className="inline-flex items-center justify-center rounded-2xl bg-sky-100 px-5 py-3 text-sm font-semibold text-sky-900 transition hover:bg-sky-200"
+        >
+          Add a spot
+        </Link>
+      </div>
+    </section>
+  )
+}
+
 export default function ResultsPage() {
   return (
     <Suspense fallback={<div className="p-6 text-white">Loading...</div>}>
@@ -223,7 +249,7 @@ function ResultsPageContent() {
         )}
 
         <section className="mb-6 rounded-[2rem] border border-white/20 bg-white/10 p-5 backdrop-blur-xl">
-          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4 text-sm text-white/85">
+          <div className="flex flex-col gap-3 text-sm text-white/85 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
             <div>
               <span className="font-semibold text-white">Search:</span>{' '}
               {filters.q || 'None'}
@@ -248,6 +274,15 @@ function ResultsPageContent() {
           </div>
         </section>
 
+        {!loading && !error && (
+          <div className="mb-6">
+            <ContributionPrompt
+              title="Know a better spot?"
+              description="Help others work anywhere by adding a place with power, Wi-Fi or better seating."
+            />
+          </div>
+        )}
+
         {loading && (
           <div className="rounded-[2rem] border border-white/20 bg-white/10 p-6 text-white/80 backdrop-blur-xl">
             Loading approved locations...
@@ -266,6 +301,15 @@ function ResultsPageContent() {
             <p className="mt-2">
               Try another search or category, or be the first to submit a better spot.
             </p>
+
+            <div className="mt-4">
+              <Link
+                href="/submit"
+                className="inline-flex items-center justify-center rounded-2xl bg-white px-5 py-3 text-sm font-semibold text-slate-900 transition hover:bg-slate-100"
+              >
+                Submit a location
+              </Link>
+            </div>
           </div>
         )}
 
@@ -274,11 +318,20 @@ function ResultsPageContent() {
         )}
 
         {!loading && !error && locations.length > 0 && view === 'list' && (
-          <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {locations.map((location) => (
-              <ResultCard key={location.id} location={location} />
-            ))}
-          </section>
+          <>
+            <section className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+              {locations.map((location) => (
+                <ResultCard key={location.id} location={location} />
+              ))}
+            </section>
+
+            <div className="mt-8">
+              <ContributionPrompt
+                title="Seen a better place nearby?"
+                description="Add it in 30 seconds and help make Plug Map more useful for the next traveller."
+              />
+            </div>
+          </>
         )}
       </div>
     </main>

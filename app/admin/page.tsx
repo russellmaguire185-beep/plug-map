@@ -13,6 +13,8 @@ type PendingLocation = {
   power: string | null
   usb: string | null
   table_type: string | null
+  mobile_signal?: string | null
+  wifi_available?: boolean | null
   hub_code: string | null
   train_platform: string | null
   terminal: string | null
@@ -44,10 +46,6 @@ function categoryBadgeColor(category: string | null | undefined) {
       return 'bg-rose-100 text-rose-700'
     case 'hotel_lobby':
       return 'bg-indigo-100 text-indigo-700'
-    case 'public_building':
-      return 'bg-slate-200 text-slate-700'
-    case 'outdoor':
-      return 'bg-lime-100 text-lime-700'
     default:
       return 'bg-slate-100 text-slate-700'
   }
@@ -69,10 +67,6 @@ function categoryIcon(category: string | null | undefined) {
       return '🍽️'
     case 'hotel_lobby':
       return '🏨'
-    case 'public_building':
-      return '🏛️'
-    case 'outdoor':
-      return '🌿'
     default:
       return '📍'
   }
@@ -91,14 +85,15 @@ export default async function AdminPage() {
     .from('locations')
     .select('*')
     .eq('status', 'pending')
-    .order('city', { ascending: true })
-    .order('name', { ascending: true })
 
   const locations: PendingLocation[] = data ?? []
+  const pendingCount = locations.length
 
   return (
     <main className="min-h-screen bg-slate-100 px-4 py-10 text-slate-900">
       <div className="mx-auto max-w-6xl">
+
+        {/* HEADER */}
         <div className="mb-6 rounded-[2rem] bg-white p-6 shadow-lg ring-1 ring-slate-200">
           <a
             href="/"
@@ -107,39 +102,43 @@ export default async function AdminPage() {
             ← Back to home
           </a>
 
-          <h1 className="mt-3 text-3xl font-bold tracking-tight">
-            Admin moderation
-          </h1>
-          <p className="mt-2 text-slate-600">
-            Review pending Plug Map submissions before they go live.
-          </p>
+          <div className="mt-3 flex items-center gap-3">
+            <h1 className="text-3xl font-bold tracking-tight">
+              Admin moderation
+            </h1>
 
-          <div className="mt-5 flex flex-wrap gap-3">
-            <a
-              href="/admin"
-              className="rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white"
-            >
-              Pending submissions
-            </a>
-
-            <a
-              href="/admin/attribute-reports"
-              className="rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-200"
-            >
-              Attribute reports
-            </a>
+            {/* 🔥 COUNTER BADGE */}
+            <span className="rounded-full bg-rose-100 px-3 py-1 text-sm font-semibold text-rose-700">
+              {pendingCount} pending
+            </span>
           </div>
+
+          <p className="mt-2 text-slate-600">
+            Review new submissions before they go live.
+          </p>
         </div>
 
-        {error ? (
+        {/* ERROR */}
+        {error && (
           <div className="mb-6 rounded-2xl border border-red-200 bg-white p-4 text-sm text-red-700 shadow-sm">
-            Error loading pending submissions: {error.message}
+            Error loading submissions: {error.message}
           </div>
-        ) : locations.length === 0 ? (
-          <div className="rounded-2xl bg-white p-6 text-slate-600 shadow-sm ring-1 ring-slate-200">
-            No pending submissions.
+        )}
+
+        {/* EMPTY STATE */}
+        {!error && pendingCount === 0 && (
+          <div className="rounded-2xl bg-white p-8 text-center shadow-sm ring-1 ring-slate-200">
+            <p className="text-lg font-semibold text-slate-900">
+              You're all caught up 🎉
+            </p>
+            <p className="mt-2 text-sm text-slate-600">
+              No pending submissions right now.
+            </p>
           </div>
-        ) : (
+        )}
+
+        {/* LIST */}
+        {!error && pendingCount > 0 && (
           <div className="grid gap-5">
             {locations.map((location) => (
               <article
@@ -147,6 +146,8 @@ export default async function AdminPage() {
                 className="rounded-[2rem] bg-white p-6 shadow-lg ring-1 ring-slate-200"
               >
                 <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+
+                  {/* LEFT */}
                   <div className="flex-1">
                     <div className="mb-3 flex flex-wrap gap-2">
                       <span
@@ -168,7 +169,8 @@ export default async function AdminPage() {
                     <h2 className="text-2xl font-bold tracking-tight">
                       {location.name}
                     </h2>
-                    <p className="mt-2 text-slate-600">
+
+                    <p className="mt-1 text-sm text-slate-600">
                       {location.city}, {location.country_code}
                     </p>
 
@@ -182,83 +184,47 @@ export default async function AdminPage() {
                       </div>
                     )}
 
+                    {/* FACILITIES */}
                     <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                       <div className="rounded-2xl bg-slate-50 p-4">
-                        <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                          Power
-                        </div>
-                        <div className="mt-1 text-sm font-semibold">
+                        <div className="text-xs text-slate-500">Power</div>
+                        <div className="mt-1 font-semibold">
                           {formatLabel(location.power)}
                         </div>
                       </div>
 
                       <div className="rounded-2xl bg-slate-50 p-4">
-                        <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                          USB
-                        </div>
-                        <div className="mt-1 text-sm font-semibold">
+                        <div className="text-xs text-slate-500">USB</div>
+                        <div className="mt-1 font-semibold">
                           {formatLabel(location.usb)}
                         </div>
                       </div>
 
                       <div className="rounded-2xl bg-slate-50 p-4">
-                        <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                          Work style
-                        </div>
-                        <div className="mt-1 text-sm font-semibold">
+                        <div className="text-xs text-slate-500">Work style</div>
+                        <div className="mt-1 font-semibold">
                           {formatLabel(location.table_type)}
                         </div>
                       </div>
 
                       <div className="rounded-2xl bg-slate-50 p-4">
-                        <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                          Hub code
-                        </div>
-                        <div className="mt-1 text-sm font-semibold">
-                          {location.hub_code || '—'}
+                        <div className="text-xs text-slate-500">Signal</div>
+                        <div className="mt-1 font-semibold">
+                          {formatLabel(location.mobile_signal)}
                         </div>
                       </div>
                     </div>
 
-                    {(location.terminal ||
-                      location.near_gate ||
-                      location.train_platform) && (
-                      <div className="mt-4 flex flex-wrap gap-4 text-sm text-slate-600">
-                        {location.terminal && (
-                          <span>Terminal: {location.terminal}</span>
-                        )}
-                        {location.near_gate && (
-                          <span>Gate: {location.near_gate}</span>
-                        )}
-                        {location.train_platform && (
-                          <span>Platform: {location.train_platform}</span>
-                        )}
-                      </div>
-                    )}
-
+                    {/* DIRECTIONS */}
                     {location.directions && (
                       <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
-                        <span className="font-semibold text-slate-900">
-                          Directions:
-                        </span>{' '}
+                        <span className="font-semibold">Directions:</span>{' '}
                         {location.directions}
-                      </div>
-                    )}
-
-                    {location.map_url && (
-                      <div className="mt-3">
-                        <a
-                          href={location.map_url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-sm font-medium text-blue-600 hover:underline"
-                        >
-                          📍 Open submitted map link →
-                        </a>
                       </div>
                     )}
                   </div>
 
+                  {/* ACTIONS */}
                   <div className="flex gap-3">
                     <ApproveButton locationId={location.id} action="approved" />
                     <ApproveButton locationId={location.id} action="rejected" />

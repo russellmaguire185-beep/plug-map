@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
 import ConfirmationButtons from '../confirmation-buttons'
 import AttributeReportModal from './attribute-report-modal'
@@ -36,6 +36,7 @@ type ResultCardProps = {
 export default function ResultCard({ location }: ResultCardProps) {
   const [isImageOpen, setIsImageOpen] = useState(false)
   const [isSuggestOpen, setIsSuggestOpen] = useState(false)
+  const [highlightConfirm, setHighlightConfirm] = useState(false)
 
   const placeLine = useMemo(() => {
     const bits: string[] = []
@@ -91,6 +92,16 @@ export default function ResultCard({ location }: ResultCardProps) {
       : Number(location.reliability_score)
 
   const trustLabel = getTrustLabel(reliabilityScore, confirmationCount)
+
+  useEffect(() => {
+    if (!highlightConfirm) return
+
+    const timer = window.setTimeout(() => {
+      setHighlightConfirm(false)
+    }, 1800)
+
+    return () => window.clearTimeout(timer)
+  }, [highlightConfirm])
 
   return (
     <>
@@ -161,11 +172,21 @@ export default function ResultCard({ location }: ResultCardProps) {
                 Community confidence
               </h4>
 
-              <span
-                className={`rounded-full px-3 py-1 text-xs font-semibold ${trustLabel.className}`}
-              >
-                {trustLabel.label}
-              </span>
+              {confirmationCount === 0 ? (
+                <button
+                  type="button"
+                  onClick={() => setHighlightConfirm(true)}
+                  className="rounded-full border border-amber-400/30 bg-amber-500/20 px-3 py-1 text-xs font-semibold text-amber-100 transition hover:bg-amber-500/30"
+                >
+                  Verify now
+                </button>
+              ) : (
+                <span
+                  className={`rounded-full px-3 py-1 text-xs font-semibold ${trustLabel.className}`}
+                >
+                  {trustLabel.label}
+                </span>
+              )}
             </div>
 
             {confirmationCount > 0 ? (
@@ -186,7 +207,7 @@ export default function ResultCard({ location }: ResultCardProps) {
                 </p>
               </div>
             ) : (
-              <div className="space-y-1 text-sm text-white/85">
+              <div className="space-y-2 text-sm text-white/85">
                 <p className="font-medium text-amber-300">
                   This location still needs verification.
                 </p>
@@ -228,7 +249,13 @@ export default function ResultCard({ location }: ResultCardProps) {
             </section>
           ) : null}
 
-          <section className="space-y-3">
+          <section
+            className={`space-y-3 rounded-2xl p-2 transition ${
+              highlightConfirm
+                ? 'ring-2 ring-emerald-300/70 bg-emerald-400/10'
+                : ''
+            }`}
+          >
             <ConfirmationButtons locationId={location.id} />
 
             <button

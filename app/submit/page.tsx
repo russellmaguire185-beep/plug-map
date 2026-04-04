@@ -49,6 +49,227 @@ const initialForm: FormState = {
   photo_url: '',
 }
 
+const countryOptions = [
+  { code: 'AF', name: 'Afghanistan' },
+  { code: 'AL', name: 'Albania' },
+  { code: 'DZ', name: 'Algeria' },
+  { code: 'AD', name: 'Andorra' },
+  { code: 'AO', name: 'Angola' },
+  { code: 'AG', name: 'Antigua and Barbuda' },
+  { code: 'AR', name: 'Argentina' },
+  { code: 'AM', name: 'Armenia' },
+  { code: 'AU', name: 'Australia' },
+  { code: 'AT', name: 'Austria' },
+  { code: 'AZ', name: 'Azerbaijan' },
+  { code: 'BS', name: 'Bahamas' },
+  { code: 'BH', name: 'Bahrain' },
+  { code: 'BD', name: 'Bangladesh' },
+  { code: 'BB', name: 'Barbados' },
+  { code: 'BY', name: 'Belarus' },
+  { code: 'BE', name: 'Belgium' },
+  { code: 'BZ', name: 'Belize' },
+  { code: 'BJ', name: 'Benin' },
+  { code: 'BT', name: 'Bhutan' },
+  { code: 'BO', name: 'Bolivia' },
+  { code: 'BA', name: 'Bosnia and Herzegovina' },
+  { code: 'BW', name: 'Botswana' },
+  { code: 'BR', name: 'Brazil' },
+  { code: 'BN', name: 'Brunei' },
+  { code: 'BG', name: 'Bulgaria' },
+  { code: 'BF', name: 'Burkina Faso' },
+  { code: 'BI', name: 'Burundi' },
+  { code: 'CV', name: 'Cabo Verde' },
+  { code: 'KH', name: 'Cambodia' },
+  { code: 'CM', name: 'Cameroon' },
+  { code: 'CA', name: 'Canada' },
+  { code: 'CF', name: 'Central African Republic' },
+  { code: 'TD', name: 'Chad' },
+  { code: 'CL', name: 'Chile' },
+  { code: 'CN', name: 'China' },
+  { code: 'CO', name: 'Colombia' },
+  { code: 'KM', name: 'Comoros' },
+  { code: 'CG', name: 'Congo' },
+  { code: 'CR', name: 'Costa Rica' },
+  { code: 'CI', name: "Côte d'Ivoire" },
+  { code: 'HR', name: 'Croatia' },
+  { code: 'CU', name: 'Cuba' },
+  { code: 'CY', name: 'Cyprus' },
+  { code: 'CZ', name: 'Czech Republic' },
+  { code: 'CD', name: 'Democratic Republic of the Congo' },
+  { code: 'DK', name: 'Denmark' },
+  { code: 'DJ', name: 'Djibouti' },
+  { code: 'DM', name: 'Dominica' },
+  { code: 'DO', name: 'Dominican Republic' },
+  { code: 'EC', name: 'Ecuador' },
+  { code: 'EG', name: 'Egypt' },
+  { code: 'SV', name: 'El Salvador' },
+  { code: 'GQ', name: 'Equatorial Guinea' },
+  { code: 'ER', name: 'Eritrea' },
+  { code: 'EE', name: 'Estonia' },
+  { code: 'SZ', name: 'Eswatini' },
+  { code: 'ET', name: 'Ethiopia' },
+  { code: 'FJ', name: 'Fiji' },
+  { code: 'FI', name: 'Finland' },
+  { code: 'FR', name: 'France' },
+  { code: 'GA', name: 'Gabon' },
+  { code: 'GM', name: 'Gambia' },
+  { code: 'GE', name: 'Georgia' },
+  { code: 'DE', name: 'Germany' },
+  { code: 'GH', name: 'Ghana' },
+  { code: 'GR', name: 'Greece' },
+  { code: 'GD', name: 'Grenada' },
+  { code: 'GT', name: 'Guatemala' },
+  { code: 'GN', name: 'Guinea' },
+  { code: 'GW', name: 'Guinea-Bissau' },
+  { code: 'GY', name: 'Guyana' },
+  { code: 'HT', name: 'Haiti' },
+  { code: 'HN', name: 'Honduras' },
+  { code: 'HU', name: 'Hungary' },
+  { code: 'IS', name: 'Iceland' },
+  { code: 'IN', name: 'India' },
+  { code: 'ID', name: 'Indonesia' },
+  { code: 'IR', name: 'Iran' },
+  { code: 'IQ', name: 'Iraq' },
+  { code: 'IE', name: 'Ireland' },
+  { code: 'IL', name: 'Israel' },
+  { code: 'IT', name: 'Italy' },
+  { code: 'JM', name: 'Jamaica' },
+  { code: 'JP', name: 'Japan' },
+  { code: 'JO', name: 'Jordan' },
+  { code: 'KZ', name: 'Kazakhstan' },
+  { code: 'KE', name: 'Kenya' },
+  { code: 'KI', name: 'Kiribati' },
+  { code: 'KW', name: 'Kuwait' },
+  { code: 'KG', name: 'Kyrgyzstan' },
+  { code: 'LA', name: 'Laos' },
+  { code: 'LV', name: 'Latvia' },
+  { code: 'LB', name: 'Lebanon' },
+  { code: 'LS', name: 'Lesotho' },
+  { code: 'LR', name: 'Liberia' },
+  { code: 'LY', name: 'Libya' },
+  { code: 'LI', name: 'Liechtenstein' },
+  { code: 'LT', name: 'Lithuania' },
+  { code: 'LU', name: 'Luxembourg' },
+  { code: 'MG', name: 'Madagascar' },
+  { code: 'MW', name: 'Malawi' },
+  { code: 'MY', name: 'Malaysia' },
+  { code: 'MV', name: 'Maldives' },
+  { code: 'ML', name: 'Mali' },
+  { code: 'MT', name: 'Malta' },
+  { code: 'MH', name: 'Marshall Islands' },
+  { code: 'MR', name: 'Mauritania' },
+  { code: 'MU', name: 'Mauritius' },
+  { code: 'MX', name: 'Mexico' },
+  { code: 'FM', name: 'Micronesia' },
+  { code: 'MD', name: 'Moldova' },
+  { code: 'MC', name: 'Monaco' },
+  { code: 'MN', name: 'Mongolia' },
+  { code: 'ME', name: 'Montenegro' },
+  { code: 'MA', name: 'Morocco' },
+  { code: 'MZ', name: 'Mozambique' },
+  { code: 'MM', name: 'Myanmar' },
+  { code: 'NA', name: 'Namibia' },
+  { code: 'NR', name: 'Nauru' },
+  { code: 'NP', name: 'Nepal' },
+  { code: 'NL', name: 'Netherlands' },
+  { code: 'NZ', name: 'New Zealand' },
+  { code: 'NI', name: 'Nicaragua' },
+  { code: 'NE', name: 'Niger' },
+  { code: 'NG', name: 'Nigeria' },
+  { code: 'KP', name: 'North Korea' },
+  { code: 'MK', name: 'North Macedonia' },
+  { code: 'NO', name: 'Norway' },
+  { code: 'OM', name: 'Oman' },
+  { code: 'PK', name: 'Pakistan' },
+  { code: 'PW', name: 'Palau' },
+  { code: 'PS', name: 'Palestine' },
+  { code: 'PA', name: 'Panama' },
+  { code: 'PG', name: 'Papua New Guinea' },
+  { code: 'PY', name: 'Paraguay' },
+  { code: 'PE', name: 'Peru' },
+  { code: 'PH', name: 'Philippines' },
+  { code: 'PL', name: 'Poland' },
+  { code: 'PT', name: 'Portugal' },
+  { code: 'QA', name: 'Qatar' },
+  { code: 'RO', name: 'Romania' },
+  { code: 'RU', name: 'Russia' },
+  { code: 'RW', name: 'Rwanda' },
+  { code: 'KN', name: 'Saint Kitts and Nevis' },
+  { code: 'LC', name: 'Saint Lucia' },
+  { code: 'VC', name: 'Saint Vincent and the Grenadines' },
+  { code: 'WS', name: 'Samoa' },
+  { code: 'SM', name: 'San Marino' },
+  { code: 'ST', name: 'Sao Tome and Principe' },
+  { code: 'SA', name: 'Saudi Arabia' },
+  { code: 'SN', name: 'Senegal' },
+  { code: 'RS', name: 'Serbia' },
+  { code: 'SC', name: 'Seychelles' },
+  { code: 'SL', name: 'Sierra Leone' },
+  { code: 'SG', name: 'Singapore' },
+  { code: 'SK', name: 'Slovakia' },
+  { code: 'SI', name: 'Slovenia' },
+  { code: 'SB', name: 'Solomon Islands' },
+  { code: 'SO', name: 'Somalia' },
+  { code: 'ZA', name: 'South Africa' },
+  { code: 'KR', name: 'South Korea' },
+  { code: 'SS', name: 'South Sudan' },
+  { code: 'ES', name: 'Spain' },
+  { code: 'LK', name: 'Sri Lanka' },
+  { code: 'SD', name: 'Sudan' },
+  { code: 'SR', name: 'Suriname' },
+  { code: 'SE', name: 'Sweden' },
+  { code: 'CH', name: 'Switzerland' },
+  { code: 'SY', name: 'Syria' },
+  { code: 'TW', name: 'Taiwan' },
+  { code: 'TJ', name: 'Tajikistan' },
+  { code: 'TZ', name: 'Tanzania' },
+  { code: 'TH', name: 'Thailand' },
+  { code: 'TL', name: 'Timor-Leste' },
+  { code: 'TG', name: 'Togo' },
+  { code: 'TO', name: 'Tonga' },
+  { code: 'TT', name: 'Trinidad and Tobago' },
+  { code: 'TN', name: 'Tunisia' },
+  { code: 'TR', name: 'Turkey' },
+  { code: 'TM', name: 'Turkmenistan' },
+  { code: 'TV', name: 'Tuvalu' },
+  { code: 'UG', name: 'Uganda' },
+  { code: 'UA', name: 'Ukraine' },
+  { code: 'AE', name: 'United Arab Emirates' },
+  { code: 'GB', name: 'United Kingdom' },
+  { code: 'US', name: 'United States' },
+  { code: 'UY', name: 'Uruguay' },
+  { code: 'UZ', name: 'Uzbekistan' },
+  { code: 'VU', name: 'Vanuatu' },
+  { code: 'VA', name: 'Vatican City' },
+  { code: 'VE', name: 'Venezuela' },
+  { code: 'VN', name: 'Vietnam' },
+  { code: 'YE', name: 'Yemen' },
+  { code: 'ZM', name: 'Zambia' },
+  { code: 'ZW', name: 'Zimbabwe' },
+]
+
+type SelectFieldProps = {
+  label: string
+  value: string
+  onChange: (value: string) => void
+  children: React.ReactNode
+}
+
+function SelectField({ label, value, onChange, children }: SelectFieldProps) {
+  return (
+    <label className="block">
+      <span className="mb-2 block text-sm font-medium text-slate-900">{label}</span>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="pm-field"
+      >
+        {children}
+      </select>
+    </label>
+  )
+}
+
 export default function SubmitPage() {
   const [form, setForm] = useState<FormState>(initialForm)
   const [userId, setUserId] = useState<string | null>(null)
@@ -87,6 +308,9 @@ export default function SubmitPage() {
 
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
     })
 
     if (error) {
@@ -160,7 +384,7 @@ export default function SubmitPage() {
     const payload = {
       category: form.category,
       city: form.city.trim(),
-      country_code: form.country_code.trim(),
+      country_code: form.country_code,
       name: form.name.trim(),
       hub_code: form.hub_code.trim() || null,
       terminal: form.terminal.trim() || null,
@@ -190,7 +414,9 @@ export default function SubmitPage() {
       return
     }
 
-    setMessage('Thanks — your submission has been sent for review.')
+    setMessage(
+      'Thanks for contributing to the Plug Map community 🚀 Your submission will be reviewed before being published. You’re helping others work anywhere.'
+    )
     setForm(initialForm)
     setSubmitting(false)
   }
@@ -239,66 +465,96 @@ export default function SubmitPage() {
             </p>
 
             <div className="mt-4 space-y-4">
-              <select
-                value={form.category}
-                onChange={(e) => updateField('category', e.target.value)}
-                className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none"
-                required
-              >
-                <option value="">What is the location?</option>
-                <option value="airport">Airport</option>
-                <option value="rail_station">Train station</option>
-                <option value="bus_station">Bus station</option>
-                <option value="service_station">Service station</option>
-                <option value="cafe">Cafe</option>
-                <option value="restaurant_bar">Restaurant / Bar</option>
-                <option value="hotel_lobby">Hotel lobby</option>
-                <option value="public_building">Public building</option>
-                <option value="outdoor">Outdoor</option>
-                <option value="other">Other</option>
-              </select>
+              <label className="block">
+                <span className="mb-2 block text-sm font-medium text-slate-900">
+                  Category
+                </span>
+                <select
+                  value={form.category}
+                  onChange={(e) => updateField('category', e.target.value)}
+                  className="pm-field"
+                  required
+                >
+                  <option value="">Select a category</option>
+                  <option value="airport">Airport</option>
+                  <option value="rail_station">Train station</option>
+                  <option value="bus_station">Bus station</option>
+                  <option value="service_station">Service station</option>
+                  <option value="cafe">Cafe</option>
+                  <option value="restaurant_bar">Restaurant / Bar</option>
+                  <option value="hotel_lobby">Hotel lobby</option>
+                  <option value="public_building">Public building</option>
+                  <option value="outdoor">Outdoor</option>
+                  <option value="other">Other</option>
+                </select>
+              </label>
 
               <div className="grid gap-4 sm:grid-cols-2">
-                <input
-                  type="text"
-                  placeholder="Town or city"
-                  value={form.city}
-                  onChange={(e) => updateField('city', e.target.value)}
-                  className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none"
-                  required
-                />
+                <label className="block">
+                  <span className="mb-2 block text-sm font-medium text-slate-900">
+                    Town or city
+                  </span>
+                  <input
+                    type="text"
+                    placeholder="e.g. London"
+                    value={form.city}
+                    onChange={(e) => updateField('city', e.target.value)}
+                    className="pm-field"
+                    required
+                  />
+                </label>
 
-                <input
-                  type="text"
-                  placeholder="Country (e.g. United Kingdom)"
-                  value={form.country_code}
-                  onChange={(e) => updateField('country_code', e.target.value)}
-                  className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none"
-                  required
-                />
+                <label className="block">
+                  <span className="mb-2 block text-sm font-medium text-slate-900">
+                    Country
+                  </span>
+                  <select
+                    value={form.country_code}
+                    onChange={(e) => updateField('country_code', e.target.value)}
+                    className="pm-field"
+                    required
+                  >
+                    <option value="">Select a country</option>
+                    {countryOptions.map((country) => (
+                      <option key={country.code} value={country.code}>
+                        {country.name}
+                      </option>
+                    ))}
+                  </select>
+                </label>
               </div>
 
-              <input
-                type="text"
-                placeholder="Place name"
-                value={form.name}
-                onChange={(e) => updateField('name', e.target.value)}
-                className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none"
-                required
-              />
-
-              {showHubCode && (
+              <label className="block">
+                <span className="mb-2 block text-sm font-medium text-slate-900">
+                  Place name
+                </span>
                 <input
                   type="text"
-                  placeholder={
-                    showAirportFields
-                      ? 'Airport code (optional, e.g. LHR)'
-                      : 'Station code (optional)'
-                  }
-                  value={form.hub_code}
-                  onChange={(e) => updateField('hub_code', e.target.value)}
-                  className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none"
+                  placeholder="e.g. Costa Coffee Terminal 5"
+                  value={form.name}
+                  onChange={(e) => updateField('name', e.target.value)}
+                  className="pm-field"
+                  required
                 />
+              </label>
+
+              {showHubCode && (
+                <label className="block">
+                  <span className="mb-2 block text-sm font-medium text-slate-900">
+                    {showAirportFields ? 'Airport code' : 'Station code'}
+                  </span>
+                  <input
+                    type="text"
+                    placeholder={
+                      showAirportFields
+                        ? 'Optional, e.g. LHR'
+                        : 'Optional station code'
+                    }
+                    value={form.hub_code}
+                    onChange={(e) => updateField('hub_code', e.target.value.toUpperCase())}
+                    className="pm-field"
+                  />
+                </label>
               )}
             </div>
           </section>
@@ -312,31 +568,47 @@ export default function SubmitPage() {
             <div className="mt-4 space-y-4">
               {showAirportFields && (
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <input
-                    type="text"
-                    placeholder="Terminal"
-                    value={form.terminal}
-                    onChange={(e) => updateField('terminal', e.target.value)}
-                    className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Near gate"
-                    value={form.near_gate}
-                    onChange={(e) => updateField('near_gate', e.target.value)}
-                    className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none"
-                  />
+                  <label className="block">
+                    <span className="mb-2 block text-sm font-medium text-slate-900">
+                      Terminal
+                    </span>
+                    <input
+                      type="text"
+                      placeholder="e.g. Terminal 2"
+                      value={form.terminal}
+                      onChange={(e) => updateField('terminal', e.target.value)}
+                      className="pm-field"
+                    />
+                  </label>
+
+                  <label className="block">
+                    <span className="mb-2 block text-sm font-medium text-slate-900">
+                      Near gate
+                    </span>
+                    <input
+                      type="text"
+                      placeholder="e.g. Gate A8"
+                      value={form.near_gate}
+                      onChange={(e) => updateField('near_gate', e.target.value)}
+                      className="pm-field"
+                    />
+                  </label>
                 </div>
               )}
 
               {showRailFields && (
-                <input
-                  type="text"
-                  placeholder="Train platform"
-                  value={form.train_platform}
-                  onChange={(e) => updateField('train_platform', e.target.value)}
-                  className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none"
-                />
+                <label className="block">
+                  <span className="mb-2 block text-sm font-medium text-slate-900">
+                    Train platform
+                  </span>
+                  <input
+                    type="text"
+                    placeholder="e.g. Platform 4"
+                    value={form.train_platform}
+                    onChange={(e) => updateField('train_platform', e.target.value)}
+                    className="pm-field"
+                  />
+                </label>
               )}
 
               <div className="space-y-3">
@@ -362,14 +634,14 @@ export default function SubmitPage() {
                     value={form.lat}
                     readOnly
                     placeholder="Latitude"
-                    className="w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm outline-none"
+                    className="pm-field-soft"
                   />
                   <input
                     type="text"
                     value={form.lng}
                     readOnly
                     placeholder="Longitude"
-                    className="w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm outline-none"
+                    className="pm-field-soft"
                   />
                 </div>
               </div>
@@ -383,63 +655,63 @@ export default function SubmitPage() {
             </p>
 
             <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              <select
+              <SelectField
+                label="Power"
                 value={form.power}
-                onChange={(e) => updateField('power', e.target.value)}
-                className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none"
+                onChange={(value) => updateField('power', value)}
               >
-                <option value="">Power available</option>
+                <option value="">Select power availability</option>
                 <option value="yes">Yes</option>
                 <option value="limited">Limited</option>
                 <option value="no">No</option>
-              </select>
+              </SelectField>
 
-              <select
+              <SelectField
+                label="USB"
                 value={form.usb}
-                onChange={(e) => updateField('usb', e.target.value)}
-                className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none"
+                onChange={(value) => updateField('usb', value)}
               >
-                <option value="">USB available</option>
+                <option value="">Select USB availability</option>
                 <option value="yes">Yes</option>
                 <option value="limited">Limited</option>
                 <option value="no">No</option>
-              </select>
+              </SelectField>
 
-              <select
+              <SelectField
+                label="Work style"
                 value={form.table_type}
-                onChange={(e) => updateField('table_type', e.target.value)}
-                className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none"
+                onChange={(value) => updateField('table_type', value)}
               >
-                <option value="">Work style</option>
+                <option value="">Select work style</option>
                 <option value="full_table">Full table</option>
                 <option value="counter">Counter</option>
                 <option value="small_table">Small table</option>
                 <option value="laptop_knee">Laptop knee</option>
                 <option value="standing_ledge">Standing ledge</option>
                 <option value="soft_seating">Soft seating</option>
-              </select>
+              </SelectField>
 
-              <select
+              <SelectField
+                label="Mobile signal"
                 value={form.mobile_signal}
-                onChange={(e) => updateField('mobile_signal', e.target.value)}
-                className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none"
+                onChange={(value) => updateField('mobile_signal', value)}
               >
-                <option value="">Mobile signal</option>
+                <option value="">Select signal strength</option>
                 <option value="fast">Fast</option>
                 <option value="medium">Medium</option>
                 <option value="slow">Slow</option>
                 <option value="none">None</option>
-              </select>
+              </SelectField>
 
-              <select
+              <SelectField
+                label="Wi-Fi"
                 value={form.wifi_available}
-                onChange={(e) => updateField('wifi_available', e.target.value)}
-                className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none"
+                onChange={(value) => updateField('wifi_available', value)}
               >
-                <option value="">Wi-Fi available</option>
+                <option value="">Select Wi-Fi availability</option>
                 <option value="yes">Yes</option>
                 <option value="no">No</option>
-              </select>
+              </SelectField>
             </div>
           </section>
 
@@ -454,7 +726,7 @@ export default function SubmitPage() {
                 type="file"
                 accept="image/*"
                 onChange={handlePhotoChange}
-                className="block w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900"
+                className="pm-field"
                 disabled={!userId || uploadingPhoto}
               />
 
@@ -475,7 +747,7 @@ export default function SubmitPage() {
                     type="text"
                     value={form.photo_url}
                     readOnly
-                    className="w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-sm text-slate-600 outline-none"
+                    className="pm-field-soft"
                   />
                 </div>
               )}
@@ -494,7 +766,7 @@ export default function SubmitPage() {
                 value={form.directions}
                 onChange={(e) => updateField('directions', e.target.value)}
                 rows={5}
-                className="w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none"
+                className="pm-field"
               />
             </div>
           </section>
