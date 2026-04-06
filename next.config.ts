@@ -10,6 +10,33 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [
+          {
+            type: 'host',
+            value: 'plug-map.com',
+          },
+        ],
+        destination: 'https://work-spots.com/:path*',
+        permanent: true,
+      },
+      {
+        source: '/:path*',
+        has: [
+          {
+            type: 'host',
+            value: 'www.plug-map.com',
+          },
+        ],
+        destination: 'https://work-spots.com/:path*',
+        permanent: true,
+      },
+    ]
+  },
 }
 
 export default nextConfig
