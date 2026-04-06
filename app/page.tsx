@@ -24,13 +24,13 @@ export default function Home() {
           <div className="mx-auto max-w-[920px] text-center">
             <div className="-mb-10 flex justify-center">
               <img
-                src="/assets/logo.svg"
+                src="/assets/work-spots-logo.png"
                 alt="Work Spots"
                 className="h-auto w-[360px] sm:w-[500px] md:w-[620px]"
               />
             </div>
 
-            <h1 className="mx-auto mt-2 max-w-[1000px] text-3xl font-bold leading-snug tracking-tight sm:text-5xl">
+            <h1 className="mx-auto mt-10 max-w-[1000px] text-3xl font-bold leading-snug tracking-tight sm:text-5xl">
               Find work-friendly places in airports, stations and cafes.
             </h1>
 

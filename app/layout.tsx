@@ -4,8 +4,8 @@ import { Analytics } from '@vercel/analytics/react'
 import './globals.css'
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://www.plug-map.com'),
-  title: 'Plug Map – Find places to work with power, Wi-Fi and seating',
+  metadataBase: new URL('https://work-spots.com'),
+  title: 'Work Spots – Find places to work with power, Wi-Fi and seating',
   description:
     'Find laptop-friendly places to work in airports, train stations, cafes and service stops. Discover locations with power sockets, Wi-Fi and mobile signal.',
   keywords: [
@@ -18,27 +18,27 @@ export const metadata: Metadata = {
     'digital nomad workspace',
     'remote work locations',
     'airport seating with power',
-    'plug map',
+    'work spots',
   ],
   openGraph: {
-    title: 'Plug Map – Find places to work anywhere',
+    title: 'Work Spots – Find places to work anywhere',
     description:
       'Discover laptop-friendly spots with power, Wi-Fi, mobile signal and proper seating.',
-    url: 'https://www.plug-map.com',
-    siteName: 'Plug Map',
+    url: 'https://work-spots.com',
+    siteName: 'Work Spots',
     images: [
       {
         url: '/plugmap-bg.png',
         width: 1200,
         height: 630,
-        alt: 'Plug Map',
+        alt: 'Work Spots',
       },
     ],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Plug Map – Find places to work anywhere',
+    title: 'Work Spots – Find places to work anywhere',
     description:
       'Discover laptop-friendly spots with power, Wi-Fi, mobile signal and proper seating.',
     images: ['/plugmap-bg.png'],
