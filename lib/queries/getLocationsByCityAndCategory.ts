@@ -4,6 +4,7 @@ export type CityCategoryLocation = {
   id: string
   name: string
   category: string | null
+  location_context: string | null
   city: string | null
   country_code: string | null
   hub_code: string | null
@@ -27,7 +28,6 @@ export type CityCategoryLocation = {
 
 const CATEGORY_MAP: Record<string, string[]> = {
   cafes: ['cafe'],
-  airports: ['airport'],
   'train-stations': ['rail_station', 'train_station', 'station'],
   'service-stops': ['service_station', 'service_stop'],
   hotels: ['hotel_lobby'],
@@ -40,7 +40,7 @@ function normaliseCity(citySlug: string) {
 }
 
 export function isSupportedSeoCategory(category: string) {
-  return Object.prototype.hasOwnProperty.call(CATEGORY_MAP, category)
+  return ['cafes', 'airports', 'train-stations', 'service-stops', 'hotels'].includes(category)
 }
 
 export async function getLocationsByCityAndCategory(
@@ -48,16 +48,16 @@ export async function getLocationsByCityAndCategory(
   categorySlug: string
 ): Promise<CityCategoryLocation[]> {
   const city = normaliseCity(citySlug)
-  const categoryValues = CATEGORY_MAP[categorySlug] ?? []
 
-  if (!city || categoryValues.length === 0) return []
+  if (!city) return []
 
-  const { data, error } = await supabase
+  let query = supabase
     .from('locations')
     .select(`
       id,
       name,
       category,
+      location_context,
       city,
       country_code,
       hub_code,
@@ -80,7 +80,18 @@ export async function getLocationsByCityAndCategory(
     `)
     .eq('status', 'approved')
     .ilike('city', city)
-    .in('category', categoryValues)
+
+  if (categorySlug === 'airports') {
+    query = query.eq('location_context', 'airport')
+  } else {
+    const categoryValues = CATEGORY_MAP[categorySlug] ?? []
+
+    if (categoryValues.length === 0) return []
+
+    query = query.in('category', categoryValues)
+  }
+
+  const { data, error } = await query
     .order('reliability_score', { ascending: false, nullsFirst: false })
     .order('confirmation_count', { ascending: false, nullsFirst: false })
     .order('last_confirmed_at', { ascending: false, nullsFirst: false })

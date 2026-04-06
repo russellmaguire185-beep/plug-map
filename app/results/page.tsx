@@ -15,6 +15,7 @@ type LocationItem = {
   id: string
   name: string
   category: string | null
+  location_context: string | null
   city: string | null
   country_code: string | null
   hub_code: string | null
@@ -227,6 +228,12 @@ function ResultsPageContent() {
     }
   }, [searchParams])
 
+  const normalizedQuery = useMemo(() => filters.q.trim().toLowerCase(), [filters.q])
+
+  const isAirportSearch = useMemo(() => {
+    return ['airport', 'airports'].includes(normalizedQuery)
+  }, [normalizedQuery])
+
   const pageTitle = useMemo(() => {
     if (filters.category === 'cafe') return 'Work-friendly cafes'
     if (filters.category === 'airport') return 'Airports with power'
@@ -309,6 +316,7 @@ function ResultsPageContent() {
           id,
           name,
           category,
+          location_context,
           city,
           country_code,
           hub_code,
@@ -333,22 +341,36 @@ function ResultsPageContent() {
         .eq('status', 'approved')
 
       if (filters.category !== 'all') {
-        query = query.eq('category', filters.category)
+        if (filters.category === 'airport') {
+          query = query.eq('location_context', 'airport')
+        } else {
+          query = query.eq('category', filters.category)
+        }
       }
 
       if (filters.q) {
-        query = query.or(
-          [
-            `name.ilike.%${filters.q}%`,
-            `city.ilike.%${filters.q}%`,
-            `hub_code.ilike.%${filters.q}%`,
-            `terminal.ilike.%${filters.q}%`,
-            `near_gate.ilike.%${filters.q}%`,
-            `train_platform.ilike.%${filters.q}%`,
-            `directions.ilike.%${filters.q}%`,
-          ].join(',')
-        )
-      }
+  const escapedQuery = filters.q.replaceAll(',', ' ').trim()
+
+  const baseSearchFilters = [
+    `name.ilike.%${escapedQuery}%`,
+    `category.ilike.%${escapedQuery}%`,
+    `city.ilike.%${escapedQuery}%`,
+    `country_code.ilike.%${escapedQuery}%`,
+    `hub_code.ilike.%${escapedQuery}%`,
+    `terminal.ilike.%${escapedQuery}%`,
+    `near_gate.ilike.%${escapedQuery}%`,
+    `train_platform.ilike.%${escapedQuery}%`,
+    `directions.ilike.%${escapedQuery}%`,
+  ]
+
+  // Only broaden to airport context when the user literally searches
+  // "airport" / "airports" and has NOT already selected Airport category.
+  if (filters.category === 'all' && isAirportSearch) {
+    baseSearchFilters.push('location_context.eq.airport')
+  }
+
+  query = query.or(baseSearchFilters.join(','))
+}
 
       if (filters.sort === 'reliable') {
         query = query
@@ -385,7 +407,7 @@ function ResultsPageContent() {
         return
       }
 
-          let nextLocations: LocationItem[] = ((data as LocationItem[]) ?? []).map((item) => ({
+      let nextLocations: LocationItem[] = ((data as LocationItem[]) ?? []).map((item) => ({
         ...item,
         distance_meters: null as number | null,
       }))
@@ -393,10 +415,7 @@ function ResultsPageContent() {
       if (filters.sort === 'nearest' && userCoords) {
         nextLocations = nextLocations
           .map((item) => {
-            if (
-              typeof item.lat === 'number' &&
-              typeof item.lng === 'number'
-            ) {
+            if (typeof item.lat === 'number' && typeof item.lng === 'number') {
               return {
                 ...item,
                 distance_meters: haversineDistanceMeters(
@@ -440,7 +459,7 @@ function ResultsPageContent() {
     }
 
     loadLocations()
-  }, [filters.category, filters.q, filters.sort, userCoords])
+  }, [filters.category, filters.q, filters.sort, isAirportSearch, userCoords])
 
   return (
     <main className="min-h-screen px-4 py-8 text-white sm:px-6 lg:px-8">
