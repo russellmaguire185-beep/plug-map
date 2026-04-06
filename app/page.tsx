@@ -5,6 +5,14 @@ import { useMemo, useState } from 'react'
 import AuthButton from '../components/auth-button'
 import NearbySpots from '../components/nearby-spots'
 
+const POPULAR_CITIES = [
+  { slug: 'london', label: 'London' },
+  { slug: 'new-york', label: 'New York' },
+  { slug: 'berlin', label: 'Berlin' },
+  { slug: 'dubai', label: 'Dubai' },
+  { slug: 'singapore', label: 'Singapore' },
+]
+
 export default function Home() {
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('all')
@@ -104,38 +112,67 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="mt-8 border-t border-white/10 pt-6 text-center">
-                <p className="text-xs font-semibold uppercase tracking-[0.28em] text-white/60">
+              <div className="mt-8 border-t border-white/10 pt-6">
+                <p className="text-center text-xs font-semibold uppercase tracking-[0.28em] text-white/60">
                   Explore
                 </p>
 
-                <div className="mt-4 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-6">
+                <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                  {POPULAR_CITIES.map((city) => (
+                    <div
+                      key={city.slug}
+                      className="rounded-2xl border border-white/10 bg-white/5 p-4 text-left"
+                    >
+                      <p className="text-sm font-semibold text-white">
+                        {city.label}
+                      </p>
+
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <Link
+                          href={`/c/${city.slug}/cafes`}
+                          className="rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-medium text-white/90 transition hover:bg-white/15"
+                        >
+                          Cafes
+                        </Link>
+
+                        <Link
+                          href={`/c/${city.slug}/airports`}
+                          className="rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-medium text-white/90 transition hover:bg-white/15"
+                        >
+                          Airports
+                        </Link>
+
+                        <Link
+                          href={`/c/${city.slug}/train-stations`}
+                          className="rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-medium text-white/90 transition hover:bg-white/15"
+                        >
+                          Train stations
+                        </Link>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-5 flex flex-wrap items-center justify-center gap-3">
                   <Link
-                    href="/results?category=cafe"
-                    className="text-sm font-medium text-white/85 underline underline-offset-4 transition hover:text-white"
+                    href="/nearby?category=cafe"
+                    className="text-sm font-medium text-white/80 underline underline-offset-4 transition hover:text-white"
                   >
-                    Work-friendly cafes
+                    Cafes near you
                   </Link>
 
                   <Link
-                    href="/results?category=airport"
-                    className="text-sm font-medium text-white/85 underline underline-offset-4 transition hover:text-white"
+                    href="/nearby?category=airport"
+                    className="text-sm font-medium text-white/80 underline underline-offset-4 transition hover:text-white"
                   >
-                    Work friendly Airports
+                    Airports near you
                   </Link>
 
                   <Link
-                    href="/results?category=hotel_lobby"
-                    className="text-sm font-medium text-white/85 underline underline-offset-4 transition hover:text-white"
+                    href="/nearby?category=rail_station"
+                    className="text-sm font-medium text-white/80 underline underline-offset-4 transition hover:text-white"
                   >
-                    Work-friendly hotels
-                  </Link>
-
-                  <Link
-                    href="/results?category=rail_station"
-                    className="text-sm font-medium text-white/85 underline underline-offset-4 transition hover:text-white"
-                  >
-                    Work-friendly Train Stations
+                    Train stations near you
                   </Link>
                 </div>
               </div>
