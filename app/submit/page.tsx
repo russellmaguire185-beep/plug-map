@@ -406,13 +406,21 @@ export default function SubmitPage() {
       status: 'pending',
     }
 
-    const { error: insertError } = await supabase.from('locations').insert([payload])
+        const response = await fetch('/api/submit-location', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      })
 
-    if (insertError) {
-      setError(insertError.message)
-      setSubmitting(false)
-      return
-    }
+      const result = await response.json()
+
+      if (!response.ok) {
+        setError(result.error || 'Failed to submit location')
+        setSubmitting(false)
+        return
+      }
 
     setMessage(
       'Thanks for contributing to the Plug Map community 🚀 Your submission will be reviewed before being published. You’re helping others work anywhere.'
