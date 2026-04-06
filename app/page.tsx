@@ -24,8 +24,8 @@ export default function Home() {
           <div className="mx-auto max-w-[920px] text-center">
             <div className="-mb-10 flex justify-center">
               <img
-                src="/assets/plug-map-logo-horizontal.svg"
-                alt="plug-map"
+                src="/assets/logo.svg"
+                alt="Work Spots"
                 className="h-auto w-[360px] sm:w-[500px] md:w-[620px]"
               />
             </div>
@@ -86,58 +86,58 @@ export default function Home() {
               </p>
 
               <div className="mt-6 text-center">
-                  <p className="text-sm text-white/70">
-                    Found a place with power, WiFi or good seating?
-                  </p>
+                <p className="text-sm text-white/70">
+                  Found a place with power, WiFi or good seating?
+                </p>
 
-                  <div className="mt-3 flex flex-wrap items-center justify-center gap-3">
-                    <a
-                      href="/submit"
-                      className="inline-flex items-center justify-center rounded-xl border border-white/20 bg-white/10 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/15"
-                    >
-                      Add it in 30 seconds ⚡
-                    </a>
+                <div className="mt-3 flex flex-wrap items-center justify-center gap-3">
+                  <a
+                    href="/submit"
+                    className="inline-flex items-center justify-center rounded-xl border border-white/20 bg-white/10 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/15"
+                  >
+                    Add it in 30 seconds ⚡
+                  </a>
 
-                    <div className="inline-flex">
-                      <AuthButton />
-                    </div>
+                  <div className="inline-flex">
+                    <AuthButton />
                   </div>
+                </div>
+              </div>
 
-                  </div>
-                <div className="mt-8 border-t border-white/10 pt-6 text-center">
-              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-white/60">
-                Explore
-              </p>
+              <div className="mt-8 border-t border-white/10 pt-6 text-center">
+                <p className="text-xs font-semibold uppercase tracking-[0.28em] text-white/60">
+                  Explore
+                </p>
 
-              <div className="mt-4 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-6">
-                <Link
-                  href="/results?category=cafe"
-                  className="text-sm font-medium text-white/85 underline underline-offset-4 transition hover:text-white"
-                >
-                  Work-friendly cafes
-                </Link>
-
-                <Link
-                  href="/results?category=airport"
-                  className="text-sm font-medium text-white/85 underline underline-offset-4 transition hover:text-white"
-                >
-                  Work friendly Airports
-                </Link>
+                <div className="mt-4 flex flex-col items-center gap-3 sm:flex-row sm:justify-center sm:gap-6">
+                  <Link
+                    href="/results?category=cafe"
+                    className="text-sm font-medium text-white/85 underline underline-offset-4 transition hover:text-white"
+                  >
+                    Work-friendly cafes
+                  </Link>
 
                   <Link
-                  href="/results?category=hotel_lobby"
-                  className="text-sm font-medium text-white/85 underline underline-offset-4 transition hover:text-white"
-                >
-                  Work-friendly hotels
-                </Link>                
-                <Link
-                  href="/results?category=rail_station"
-                  className="text-sm font-medium text-white/85 underline underline-offset-4 transition hover:text-white"
-                >
-                  Work-friendly Train Stations
-                </Link>   
-              </div>
-                      
+                    href="/results?category=airport"
+                    className="text-sm font-medium text-white/85 underline underline-offset-4 transition hover:text-white"
+                  >
+                    Work friendly Airports
+                  </Link>
+
+                  <Link
+                    href="/results?category=hotel_lobby"
+                    className="text-sm font-medium text-white/85 underline underline-offset-4 transition hover:text-white"
+                  >
+                    Work-friendly hotels
+                  </Link>
+
+                  <Link
+                    href="/results?category=rail_station"
+                    className="text-sm font-medium text-white/85 underline underline-offset-4 transition hover:text-white"
+                  >
+                    Work-friendly Train Stations
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
