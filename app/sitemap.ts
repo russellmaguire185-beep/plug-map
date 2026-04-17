@@ -31,30 +31,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date()
 
   const staticPages: MetadataRoute.Sitemap = [
-    {
-      url: `${baseUrl}`,
-      lastModified: now,
-    },
-    {
-      url: `${baseUrl}/results`,
-      lastModified: now,
-    },
-    {
-      url: `${baseUrl}/submit`,
-      lastModified: now,
-    },
-    {
-      url: `${baseUrl}/work-friendly-cafes`,
-      lastModified: now,
-    },
-    {
-      url: `${baseUrl}/airports-with-power`,
-      lastModified: now,
-    },
-    {
-      url: `${baseUrl}/laptop-friendly-spots`,
-      lastModified: now,
-    },
+    { url: `${baseUrl}`, lastModified: now },
+    { url: `${baseUrl}/results`, lastModified: now },
+    { url: `${baseUrl}/submit`, lastModified: now },
+    { url: `${baseUrl}/work-friendly-cafes`, lastModified: now },
+    { url: `${baseUrl}/airports-with-power`, lastModified: now },
+    { url: `${baseUrl}/laptop-friendly-spots`, lastModified: now },
   ]
 
   const { data: stationRows, error: stationError } = await supabase
@@ -86,7 +68,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .from('locations')
     .select('hub_code')
     .eq('status', 'approved')
-    .eq('location_context', 'airport')
+    .eq('category', 'airport')
     .not('hub_code', 'is', null)
 
   if (airportError) {
