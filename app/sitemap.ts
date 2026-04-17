@@ -31,18 +31,37 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const now = new Date()
 
   const staticPages: MetadataRoute.Sitemap = [
-    { url: `${baseUrl}`, lastModified: now },
-    { url: `${baseUrl}/results`, lastModified: now },
-    { url: `${baseUrl}/submit`, lastModified: now },
-    { url: `${baseUrl}/work-friendly-cafes`, lastModified: now },
-    { url: `${baseUrl}/airports-with-power`, lastModified: now },
-    { url: `${baseUrl}/laptop-friendly-spots`, lastModified: now },
+    {
+      url: `${baseUrl}`,
+      lastModified: now,
+    },
+    {
+      url: `${baseUrl}/results`,
+      lastModified: now,
+    },
+    {
+      url: `${baseUrl}/submit`,
+      lastModified: now,
+    },
+    {
+      url: `${baseUrl}/work-friendly-cafes`,
+      lastModified: now,
+    },
+    {
+      url: `${baseUrl}/airports-with-power`,
+      lastModified: now,
+    },
+    {
+      url: `${baseUrl}/laptop-friendly-spots`,
+      lastModified: now,
+    },
   ]
 
   const { data: stationRows, error: stationError } = await supabase
     .from('locations')
     .select('station_slug')
     .eq('status', 'approved')
+    .eq('category', 'rail_station')
     .not('station_slug', 'is', null)
 
   if (stationError) {
@@ -55,7 +74,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         .map((row) => row.station_slug?.trim().toLowerCase() ?? '')
         .filter((slug) => slug.length > 0)
         .filter(isLikelyStationSlug)
-        .filter((slug) => slug !== 'upper-crust')
     )
   )
 
@@ -69,8 +87,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .select('hub_code')
     .eq('status', 'approved')
     .eq('location_context', 'airport')
-    .neq('category', 'rail_station')
-    .is('station_slug', null)
     .not('hub_code', 'is', null)
 
   if (airportError) {
