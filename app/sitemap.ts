@@ -37,28 +37,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ]
 
-  const { data: stationRows, error: stationError } = await supabase
-    .from('locations')
-    .select('station_slug')
-    .eq('status', 'approved')
-    .not('station_slug', 'is', null)
+ const { data: stationRows } = await supabase
+  .from('locations')
+  .select('station_slug')
+  .eq('status', 'approved')
+  .not('station_slug', 'is', null)
 
-  if (stationError) {
-    console.error('Sitemap station query error:', stationError.message)
-  }
+const uniqueStationSlugs = [
+  ...new Set(
+    (stationRows ?? [])
+      .map((row) => row.station_slug?.trim().toLowerCase())
+      .filter((slug) => slug && slug.includes('-')) // basic sanity filter
+  ),
+]
 
-  const uniqueStationSlugs = Array.from(
-    new Set(
-      (stationRows ?? [])
-        .map((row) => row.station_slug)
-        .filter((value): value is string => typeof value === 'string' && value.trim().length > 0)
-    )
-  )
-
-  const stationPages: MetadataRoute.Sitemap = uniqueStationSlugs.map((slug) => ({
-    url: `${baseUrl}/station/${slug}`,
-    lastModified: now,
-  }))
+const stationPages = uniqueStationSlugs.map((slug) => ({
+  url: `https://work-spots.com/station/${slug}`,
+  lastModified: new Date(),
+}))
 
   const { data: airportRows, error: airportError } = await supabase
     .from('locations')
