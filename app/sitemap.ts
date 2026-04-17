@@ -7,6 +7,7 @@ type StationRow = {
 
 type AirportRow = {
   hub_code: string | null
+  location_context: string | null
 }
 
 function isCleanSlug(value: string) {
@@ -18,7 +19,7 @@ function isLikelyStationSlug(value: string) {
 }
 
 function isLikelyAirportCode(value: string) {
-  return /^[A-Za-z0-9]{3,5}$/.test(value)
+  return /^[a-z0-9]{3,5}$/.test(value)
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -58,12 +59,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ]
 
   const { data: stationRows, error: stationError } = await supabase
-    const { data: airportRows, error: airportError } = await supabase
-  .from('locations')
-  .select('hub_code')
-  .eq('status', 'approved')
-  .eq('location_context', 'airport')
-  .not('hub_code', 'is', null)
+    .from('locations')
+    .select('station_slug')
+    .eq('status', 'approved')
+    .not('station_slug', 'is', null)
 
   if (stationError) {
     console.error('Sitemap station query error:', stationError.message)
@@ -75,7 +74,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         .map((row) => row.station_slug?.trim().toLowerCase() ?? '')
         .filter((slug) => slug.length > 0)
         .filter(isLikelyStationSlug)
-        .filter((slug) => !slug.includes('&'))
+        .filter((slug) => slug !== 'upper-crust')
     )
   )
 
@@ -86,8 +85,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const { data: airportRows, error: airportError } = await supabase
     .from('locations')
-    .select('hub_code')
+    .select('hub_code, location_context')
     .eq('status', 'approved')
+    .eq('location_context', 'airport')
     .not('hub_code', 'is', null)
 
   if (airportError) {
