@@ -28,6 +28,7 @@ type Location = {
   confirmation_count?: number | null
   last_confirmed_at?: string | null
   reliability_score?: number | string | null
+  station_slug?: string | null
 }
 
 type ResultCardProps = {
@@ -79,6 +80,9 @@ export default function ResultCard({ location }: ResultCardProps) {
 
   const trustLabel = getTrustLabel(reliabilityScore, confirmationCount)
 
+  const isRailStation =
+    location.category?.toLowerCase() === 'rail_station' && !!location.station_slug
+
   useEffect(() => {
     if (!highlightConfirm) return
 
@@ -96,9 +100,21 @@ export default function ResultCard({ location }: ResultCardProps) {
           <div className="mb-4">
             <div className="mb-2 flex items-start justify-between gap-3">
               <div>
-                <h3 className="text-2xl font-bold leading-tight text-white">
-                  {location.name}
-                </h3>
+                {isRailStation ? (
+                  <Link
+                    href={`/station/${location.station_slug}`}
+                    className="inline-block"
+                  >
+                    <h3 className="text-2xl font-bold leading-tight text-white transition hover:text-sky-300">
+                      {location.name}
+                    </h3>
+                  </Link>
+                ) : (
+                  <h3 className="text-2xl font-bold leading-tight text-white">
+                    {location.name}
+                  </h3>
+                )}
+
                 <p className="mt-1 text-sm font-medium text-white/75">
                   {location.city}
                   {location.city && location.country_code ? ', ' : ''}
@@ -399,6 +415,7 @@ function formatCategory(category?: string | null) {
 
   if (normalized === 'airport') return 'Airport'
   if (normalized === 'train_station') return 'Rail station'
+  if (normalized === 'rail_station') return 'Rail station'
   if (normalized === 'station') return 'Rail station'
   if (normalized === 'cafe') return 'Cafe'
   if (normalized === 'service_stop') return 'Service stop'

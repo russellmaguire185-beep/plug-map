@@ -27,6 +27,7 @@ type FormState = {
   lat: string
   lng: string
   photo_url: string
+  station_slug: string
 }
 
 type KnownStationOption = {
@@ -56,6 +57,7 @@ const initialForm: FormState = {
   lat: '',
   lng: '',
   photo_url: '',
+  station_slug: '',
 }
 
 const knownTrainStations: KnownStationOption[] = [
@@ -379,24 +381,29 @@ export default function SubmitPage() {
   }
 
   function handleKnownStationChange(value: string) {
-  setSelectedKnownStation(value)
+    setSelectedKnownStation(value)
 
-  if (value === '') {
-    return
+    if (value === '') {
+      setForm((prev) => ({
+        ...prev,
+        station_slug: '',
+      }))
+      return
+    }
+
+    const station = knownTrainStations.find((item) => item.value === value)
+
+    if (!station) return
+
+    setForm((prev) => ({
+      ...prev,
+      name: station.name,
+      city: station.city,
+      country_code: station.country_code,
+      hub_code: station.hub_code,
+      station_slug: station.value,
+    }))
   }
-
-  const station = knownTrainStations.find((item) => item.value === value)
-
-  if (!station) return
-
-  setForm((prev) => ({
-    ...prev,
-    name: station.name,
-    city: station.city,
-    country_code: station.country_code,
-    hub_code: station.hub_code,
-  }))
-}
 
   async function handlePhotoChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -463,6 +470,7 @@ export default function SubmitPage() {
       terminal: form.terminal.trim() || null,
       near_gate: form.near_gate.trim() || null,
       train_platform: form.train_platform.trim() || null,
+      station_slug: form.station_slug || null,
       power: form.power || null,
       usb: form.usb || null,
       table_type: form.table_type || null,
@@ -555,7 +563,12 @@ export default function SubmitPage() {
                   value={form.category}
                   onChange={(e) => {
                     const nextCategory = e.target.value
-                    updateField('category', nextCategory)
+
+                    setForm((prev) => ({
+                      ...prev,
+                      category: nextCategory,
+                      station_slug: nextCategory === 'rail_station' ? prev.station_slug : '',
+                    }))
 
                     if (nextCategory !== 'rail_station') {
                       setSelectedKnownStation('')
