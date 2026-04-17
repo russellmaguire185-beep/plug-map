@@ -29,6 +29,15 @@ type FormState = {
   photo_url: string
 }
 
+type KnownStationOption = {
+  label: string
+  value: string
+  name: string
+  city: string
+  country_code: string
+  hub_code: string
+}
+
 const initialForm: FormState = {
   category: '',
   city: '',
@@ -48,6 +57,49 @@ const initialForm: FormState = {
   lng: '',
   photo_url: '',
 }
+
+const knownTrainStations: KnownStationOption[] = [
+  {
+    label: 'London Paddington',
+    value: 'london-paddington',
+    name: 'London Paddington',
+    city: 'London',
+    country_code: 'GB',
+    hub_code: '',
+  },
+  {
+    label: 'London Waterloo',
+    value: 'london-waterloo',
+    name: 'London Waterloo',
+    city: 'London',
+    country_code: 'GB',
+    hub_code: '',
+  },
+  {
+    label: 'Amsterdam Centraal',
+    value: 'amsterdam-centraal',
+    name: 'Amsterdam Centraal',
+    city: 'Amsterdam',
+    country_code: 'NL',
+    hub_code: '',
+  },
+  {
+    label: 'Paris Gare du Nord',
+    value: 'paris-gare-du-nord',
+    name: 'Paris Gare du Nord',
+    city: 'Paris',
+    country_code: 'FR',
+    hub_code: '',
+  },
+  {
+    label: 'Berlin Hauptbahnhof',
+    value: 'berlin-hauptbahnhof',
+    name: 'Berlin Hauptbahnhof',
+    city: 'Berlin',
+    country_code: 'DE',
+    hub_code: '',
+  },
+]
 
 const countryOptions = [
   { code: 'AF', name: 'Afghanistan' },
@@ -272,6 +324,7 @@ function SelectField({ label, value, onChange, children }: SelectFieldProps) {
 
 export default function SubmitPage() {
   const [form, setForm] = useState<FormState>(initialForm)
+  const [selectedKnownStation, setSelectedKnownStation] = useState('')
   const [userId, setUserId] = useState<string | null>(null)
   const [loadingUser, setLoadingUser] = useState(true)
   const [submitting, setSubmitting] = useState(false)
@@ -324,6 +377,26 @@ export default function SubmitPage() {
       [key]: value,
     }))
   }
+
+  function handleKnownStationChange(value: string) {
+  setSelectedKnownStation(value)
+
+  if (value === '') {
+    return
+  }
+
+  const station = knownTrainStations.find((item) => item.value === value)
+
+  if (!station) return
+
+  setForm((prev) => ({
+    ...prev,
+    name: station.name,
+    city: station.city,
+    country_code: station.country_code,
+    hub_code: station.hub_code,
+  }))
+}
 
   async function handlePhotoChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -406,26 +479,27 @@ export default function SubmitPage() {
       status: 'pending',
     }
 
-        const response = await fetch('/api/submit-location', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload),
-      })
+    const response = await fetch('/api/submit-location', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    })
 
-      const result = await response.json()
+    const result = await response.json()
 
-      if (!response.ok) {
-        setError(result.error || 'Failed to submit location')
-        setSubmitting(false)
-        return
-      }
+    if (!response.ok) {
+      setError(result.error || 'Failed to submit location')
+      setSubmitting(false)
+      return
+    }
 
     setMessage(
       'Thanks for contributing to the Plug Map community 🚀 Your submission will be reviewed before being published. You’re helping others work anywhere.'
     )
     setForm(initialForm)
+    setSelectedKnownStation('')
     setSubmitting(false)
   }
 
@@ -479,7 +553,14 @@ export default function SubmitPage() {
                 </span>
                 <select
                   value={form.category}
-                  onChange={(e) => updateField('category', e.target.value)}
+                  onChange={(e) => {
+                    const nextCategory = e.target.value
+                    updateField('category', nextCategory)
+
+                    if (nextCategory !== 'rail_station') {
+                      setSelectedKnownStation('')
+                    }
+                  }}
                   className="pm-field"
                   required
                 >
@@ -496,6 +577,29 @@ export default function SubmitPage() {
                   <option value="other">Other</option>
                 </select>
               </label>
+
+              {showRailFields && (
+                <label className="block">
+                  <span className="mb-2 block text-sm font-medium text-slate-900">
+                    Known station
+                  </span>
+                  <select
+                    value={selectedKnownStation}
+                    onChange={(e) => handleKnownStationChange(e.target.value)}
+                    className="pm-field"
+                  >
+                    <option value="">Other / not listed</option>
+                    {knownTrainStations.map((station) => (
+                      <option key={station.value} value={station.value}>
+                        {station.label}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="mt-2 text-xs text-slate-500">
+                    Select a known station to prefill the place name, city and country.
+                  </p>
+                </label>
+              )}
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <label className="block">

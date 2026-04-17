@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import ConfirmationButtons from '../confirmation-buttons'
 import AttributeReportModal from './attribute-report-modal'
 
@@ -38,30 +39,15 @@ export default function ResultCard({ location }: ResultCardProps) {
   const [isSuggestOpen, setIsSuggestOpen] = useState(false)
   const [highlightConfirm, setHighlightConfirm] = useState(false)
 
-  const placeLine = useMemo(() => {
-    const bits: string[] = []
+  const terminalText = useMemo(() => {
+    if (!location.terminal) return null
 
-    if (location.hub_code) bits.push(location.hub_code)
+    const trimmed = location.terminal.trim()
+    return /^t/i.test(trimmed) ? trimmed : `T${trimmed}`
+  }, [location.terminal])
 
-    if (location.terminal) {
-      const terminalText = /^t/i.test(location.terminal.trim())
-        ? location.terminal.trim()
-        : `T${location.terminal.trim()}`
-      bits.push(terminalText)
-    }
-
-    if (location.near_gate) bits.push(`Gate ${location.near_gate}`)
-    if (location.train_platform) bits.push(`Platform ${location.train_platform}`)
-
-    if (!bits.length) {
-      if (location.city && location.country_code) {
-        return `${location.city}, ${location.country_code}`
-      }
-      return location.city || location.country_code || 'Location details pending'
-    }
-
-    return bits.join(' • ')
-  }, [location])
+  const hasStructuredPlaceLine =
+    !!location.hub_code || !!terminalText || !!location.near_gate || !!location.train_platform
 
   const googleMapsUrl = useMemo(() => {
     if (
@@ -128,7 +114,47 @@ export default function ResultCard({ location }: ResultCardProps) {
             </div>
 
             <div className="rounded-2xl border border-white/10 bg-black/15 px-3 py-2 text-sm font-semibold text-white/90">
-              📍 {placeLine}
+              <span className="mr-1">📍</span>
+
+              {hasStructuredPlaceLine ? (
+                <>
+                  {location.hub_code ? (
+                    <Link
+                      href={`/airport/${location.hub_code.toLowerCase()}`}
+                      className="underline decoration-white/30 underline-offset-4 transition hover:text-sky-300 hover:decoration-sky-300"
+                    >
+                      {location.hub_code}
+                    </Link>
+                  ) : null}
+
+                  {terminalText ? (
+                    <>
+                      {location.hub_code ? ' • ' : ''}
+                      {terminalText}
+                    </>
+                  ) : null}
+
+                  {location.near_gate ? (
+                    <>
+                      {location.hub_code || terminalText ? ' • ' : ''}
+                      Gate {location.near_gate}
+                    </>
+                  ) : null}
+
+                  {location.train_platform ? (
+                    <>
+                      {location.hub_code || terminalText || location.near_gate ? ' • ' : ''}
+                      Platform {location.train_platform}
+                    </>
+                  ) : null}
+                </>
+              ) : (
+                <>
+                  {location.city && location.country_code
+                    ? `${location.city}, ${location.country_code}`
+                    : location.city || location.country_code || 'Location details pending'}
+                </>
+              )}
             </div>
           </div>
 
