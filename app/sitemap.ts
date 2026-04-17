@@ -1,6 +1,26 @@
 import { MetadataRoute } from 'next'
 import { createClient } from '@supabase/supabase-js'
 
+type StationRow = {
+  station_slug: string | null
+}
+
+type AirportRow = {
+  hub_code: string | null
+}
+
+function isCleanSlug(value: string) {
+  return /^[a-z0-9-]+$/.test(value)
+}
+
+function isLikelyStationSlug(value: string) {
+  return isCleanSlug(value) && value.includes('-')
+}
+
+function isLikelyAirportCode(value: string) {
+  return /^[A-Za-z0-9]{3,5}$/.test(value)
+}
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -12,7 +32,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const staticPages: MetadataRoute.Sitemap = [
     {
-      url: `${baseUrl}/`,
+      url: `${baseUrl}`,
       lastModified: now,
     },
     {
@@ -37,24 +57,30 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ]
 
- const { data: stationRows } = await supabase
-  .from('locations')
-  .select('station_slug')
-  .eq('status', 'approved')
-  .not('station_slug', 'is', null)
+  const { data: stationRows, error: stationError } = await supabase
+    .from('locations')
+    .select('station_slug')
+    .eq('status', 'approved')
+    .not('station_slug', 'is', null)
 
-const uniqueStationSlugs = [
-  ...new Set(
-    (stationRows ?? [])
-      .map((row) => row.station_slug?.trim().toLowerCase())
-      .filter((slug) => slug && slug.includes('-')) // basic sanity filter
-  ),
-]
+  if (stationError) {
+    console.error('Sitemap station query error:', stationError.message)
+  }
 
-const stationPages = uniqueStationSlugs.map((slug) => ({
-  url: `https://work-spots.com/station/${slug}`,
-  lastModified: new Date(),
-}))
+  const uniqueStationSlugs = Array.from(
+    new Set(
+      ((stationRows ?? []) as StationRow[])
+        .map((row) => row.station_slug?.trim().toLowerCase() ?? '')
+        .filter((slug) => slug.length > 0)
+        .filter(isLikelyStationSlug)
+        .filter((slug) => !slug.includes('&'))
+    )
+  )
+
+  const stationPages: MetadataRoute.Sitemap = uniqueStationSlugs.map((slug) => ({
+    url: `${baseUrl}/station/${slug}`,
+    lastModified: now,
+  }))
 
   const { data: airportRows, error: airportError } = await supabase
     .from('locations')
@@ -68,10 +94,10 @@ const stationPages = uniqueStationSlugs.map((slug) => ({
 
   const uniqueAirportCodes = Array.from(
     new Set(
-      (airportRows ?? [])
-        .map((row) => row.hub_code)
-        .filter((value): value is string => typeof value === 'string' && value.trim().length > 0)
-        .map((value) => value.toLowerCase())
+      ((airportRows ?? []) as AirportRow[])
+        .map((row) => row.hub_code?.trim().toLowerCase() ?? '')
+        .filter((code) => code.length > 0)
+        .filter(isLikelyAirportCode)
     )
   )
 
