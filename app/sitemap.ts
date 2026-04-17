@@ -58,10 +58,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ]
 
   const { data: stationRows, error: stationError } = await supabase
-    .from('locations')
-    .select('station_slug')
-    .eq('status', 'approved')
-    .not('station_slug', 'is', null)
+    const { data: airportRows, error: airportError } = await supabase
+  .from('locations')
+  .select('hub_code')
+  .eq('status', 'approved')
+  .eq('location_context', 'airport')
+  .not('hub_code', 'is', null)
 
   if (stationError) {
     console.error('Sitemap station query error:', stationError.message)
