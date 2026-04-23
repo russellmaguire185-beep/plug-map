@@ -1,6 +1,6 @@
 import { createSupabaseServerClient } from '@/lib/supabase-server'
 import ResultCard from '@/components/results/result-card'
-import ResultsMap from '@/components/results-map'
+import ResultsMap from '@/components/results-map-client'
 
 type LocationItem = {
   id: string
