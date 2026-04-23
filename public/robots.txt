@@ -1,4 +1,4 @@
 User-agent: *
-Allow: /
+Disallow:
 
-Sitemap: https://www.plug-map.com/sitemap.xml
+Sitemap: https://work-spots.com/sitemap.xml
