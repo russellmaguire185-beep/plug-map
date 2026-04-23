@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { requireAdmin } from '@/lib/is-admin'
+import { supabaseAdmin } from '@/lib/supabase-admin'
 import ApproveButton from '@/components/approve-button'
 
 export const dynamic = 'force-dynamic'
@@ -79,12 +80,11 @@ export default async function AdminPage() {
     redirect('/')
   }
 
-  const { supabase } = adminCheck
-
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from('locations')
     .select('*')
     .eq('status', 'pending')
+    .order('created_at', { ascending: false })
 
   const locations: PendingLocation[] = data ?? []
   const pendingCount = locations.length
@@ -92,8 +92,6 @@ export default async function AdminPage() {
   return (
     <main className="min-h-screen bg-slate-100 px-4 py-10 text-slate-900">
       <div className="mx-auto max-w-6xl">
-
-        {/* HEADER */}
         <div className="mb-6 rounded-[2rem] bg-white p-6 shadow-lg ring-1 ring-slate-200">
           <a
             href="/"
@@ -107,7 +105,6 @@ export default async function AdminPage() {
               Admin moderation
             </h1>
 
-            {/* 🔥 COUNTER BADGE */}
             <span className="rounded-full bg-rose-100 px-3 py-1 text-sm font-semibold text-rose-700">
               {pendingCount} pending
             </span>
@@ -118,14 +115,12 @@ export default async function AdminPage() {
           </p>
         </div>
 
-        {/* ERROR */}
         {error && (
           <div className="mb-6 rounded-2xl border border-red-200 bg-white p-4 text-sm text-red-700 shadow-sm">
             Error loading submissions: {error.message}
           </div>
         )}
 
-        {/* EMPTY STATE */}
         {!error && pendingCount === 0 && (
           <div className="rounded-2xl bg-white p-8 text-center shadow-sm ring-1 ring-slate-200">
             <p className="text-lg font-semibold text-slate-900">
@@ -137,7 +132,6 @@ export default async function AdminPage() {
           </div>
         )}
 
-        {/* LIST */}
         {!error && pendingCount > 0 && (
           <div className="grid gap-5">
             {locations.map((location) => (
@@ -146,8 +140,6 @@ export default async function AdminPage() {
                 className="rounded-[2rem] bg-white p-6 shadow-lg ring-1 ring-slate-200"
               >
                 <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-
-                  {/* LEFT */}
                   <div className="flex-1">
                     <div className="mb-3 flex flex-wrap gap-2">
                       <span
@@ -184,7 +176,6 @@ export default async function AdminPage() {
                       </div>
                     )}
 
-                    {/* FACILITIES */}
                     <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                       <div className="rounded-2xl bg-slate-50 p-4">
                         <div className="text-xs text-slate-500">Power</div>
@@ -215,7 +206,6 @@ export default async function AdminPage() {
                       </div>
                     </div>
 
-                    {/* DIRECTIONS */}
                     {location.directions && (
                       <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
                         <span className="font-semibold">Directions:</span>{' '}
@@ -224,7 +214,6 @@ export default async function AdminPage() {
                     )}
                   </div>
 
-                  {/* ACTIONS */}
                   <div className="flex gap-3">
                     <ApproveButton locationId={location.id} action="approved" />
                     <ApproveButton locationId={location.id} action="rejected" />
